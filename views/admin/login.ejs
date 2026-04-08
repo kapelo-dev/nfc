@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion Admin - NFC Card Manager</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd 0%, #90caf9 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .subtitle {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #42a5f5;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #42a5f5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: #1e88e5;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .error {
+      background: #fee;
+      color: #c33;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border-left: 4px solid #c33;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>🔐 Connexion Admin</h1>
+    <p class="subtitle">NFC Card Manager</p>
+    
+    <% if (error) { %>
+      <div class="error"><%= error %></div>
+    <% } %>
+    
+    <form method="POST" action="/admin/login">
+      <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input type="text" id="username" name="username" required autofocus>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Mot de passe</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      
+      <button type="submit">Se connecter</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil non trouvé - NFC Card</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd 0%, #90caf9 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .error-container {
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+      max-width: 500px;
+      width: 100%;
+      padding: 60px 40px;
+      text-align: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .error-icon {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 30px;
+      background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(66, 165, 245, 0.3);
+    }
+    .error-icon i {
+      font-size: 60px;
+      color: white;
+    }
+    h1 {
+      color: #333;
+      font-size: 28px;
+      margin-bottom: 15px;
+    }
+    .error-code {
+      color: #42a5f5;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    p {
+      color: #666;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+    .reasons {
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .reasons h3 {
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .reasons ul {
+      list-style: none;
+      padding: 0;
+    }
+    .reasons li {
+      color: #666;
+      font-size: 14px;
+      padding: 8px 0;
+      padding-left: 25px;
+      position: relative;
+    }
+    .reasons li:before {
+      content: "•";
+      color: #42a5f5;
+      font-weight: bold;
+      position: absolute;
+      left: 10px;
+    }
+    .home-link {
+      display: inline-block;
+      padding: 14px 30px;
+      background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(66, 165, 245, 0.3);
+    }
+    .home-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(66, 165, 245, 0.4);
+    }
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+      color: #999;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    
+    <h1>Profil non trouvé</h1>
+    <div class="error-code">Erreur 404</div>
+    
+    <p>Désolé, nous n'avons pas pu trouver le profil que vous recherchez.</p>
+    
+    <div class="reasons">
+      <h3>Raisons possibles :</h3>
+      <ul>
+        <li>Le lien est incorrect ou a expiré</li>
+        <li>La carte NFC a été désactivée</li>
+        <li>Le profil a été supprimé</li>
+        <li>L'URL contient une erreur de frappe</li>
+      </ul>
+    </div>
+    
+    <div class="footer">
+      NFC Card Manager
+    </div>
+  </div>
+</body>
+</html>
