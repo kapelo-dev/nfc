@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #db2777, #be185d 40%, #9d174d);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; color: #fff;
+    }
+    .card { max-width: 440px; width: 100%; text-align: center; }
+    .profile-photo, .default-avatar {
+      width: 128px; height: 128px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 20px;
+      border: 5px solid #fff;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    }
+    .profile-photo { display: block; }
+    .default-avatar { background: #fff; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+    .default-avatar i { font-size: 52px; color: #db2777; }
+    .profile-name { font-size: 30px; font-weight: 800; }
+    .profile-title { opacity: 0.9; font-weight: 500; margin: 6px 0 14px; }
+    .profile-bio { opacity: 0.85; line-height: 1.7; margin-bottom: 28px; font-size: 14px; }
+    .social-grid { display: flex; flex-direction: column; gap: 10px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 15px; border-radius: 16px; text-decoration: none;
+      background: #fff; color: #be185d; font-weight: 700; font-size: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12); transition: 0.2s;
+    }
+    .social-link:hover { transform: scale(1.03); }
+    .no-social { opacity: 0.7; }
+    .footer { margin-top: 24px; font-size: 12px; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">NFC Card</p>
+  </div>
+</body>
+</html>

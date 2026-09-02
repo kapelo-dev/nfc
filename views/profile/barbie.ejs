@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #ec4899;
+      background-image: radial-gradient(circle at 20% 20%, #f9a8d4 0, transparent 40%),
+        radial-gradient(circle at 80% 80%, #f472b6 0, transparent 35%);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 420px; width: 100%;
+      background: #fff;
+      border-radius: 28px;
+      padding: 36px 24px 24px;
+      text-align: center;
+      box-shadow: 8px 8px 0 #831843;
+    }
+    .profile-photo, .default-avatar {
+      width: 120px; height: 120px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 16px;
+      border: 6px solid #fbcfe8;
+    }
+    .profile-photo { display: block; }
+    .default-avatar { background: #fdf2f8; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+    .default-avatar i { font-size: 48px; color: #ec4899; }
+    .profile-name { font-size: 28px; font-weight: 900; color: #500724; }
+    .profile-title { color: #ec4899; font-weight: 800; margin: 4px 0 12px; }
+    .profile-bio { color: #831843; font-weight: 600; line-height: 1.6; margin-bottom: 24px; }
+    .social-grid { display: flex; flex-direction: column; gap: 8px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px; border-radius: 999px; text-decoration: none;
+      background: #ec4899; color: #fff; font-weight: 800; font-size: 14px;
+      box-shadow: 3px 3px 0 #831843; transition: 0.15s;
+    }
+    .social-link:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 #831843; }
+    .no-social { color: #f9a8d4; font-weight: 700; }
+    .footer { margin-top: 18px; font-weight: 800; color: #f9a8d4; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">✨ it's giving ✨</p>
+  </div>
+</body>
+</html>

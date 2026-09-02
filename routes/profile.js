@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/database');
+const { resolve, getTheme } = require('../config/templates');
 
 router.get('/:card_id', async (req, res) => {
   try {
@@ -11,7 +12,7 @@ router.get('/:card_id', async (req, res) => {
     }
     
     const card = cards[0];
-    res.render('profile/default', { card });
+    res.render(`profile/${resolve(card.template)}`, { card, theme: getTheme(card) });
   } catch (error) {
     console.error('Profile error:', error);
     res.status(500).render('profile/not-found');

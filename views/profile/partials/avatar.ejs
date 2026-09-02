@@ -1,0 +1,7 @@
+<% if (card.photo_url) { %>
+  <img src="<%= card.photo_url %>" alt="<%= card.name %>" class="profile-photo">
+<% } else { %>
+  <div class="default-avatar">
+    <i class="fas fa-user"></i>
+  </div>
+<% } %>

@@ -45,9 +45,60 @@
       background: rgba(255,255,255,0.3);
     }
     .container {
-      max-width: 800px;
+      max-width: 1180px;
       margin: 40px auto;
       padding: 0 20px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: start;
+    }
+    .preview-pane {
+      position: sticky;
+      top: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 20px 16px;
+    }
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .preview-head h3 {
+      color: #333;
+      font-size: 15px;
+    }
+    .preview-head a {
+      font-size: 12px;
+      color: #42a5f5;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .preview-head a:hover { text-decoration: underline; }
+    .phone {
+      width: 270px;
+      height: 540px;
+      margin: 0 auto;
+      border: 10px solid #1a1a1a;
+      border-radius: 32px;
+      overflow: hidden;
+      background: #111;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+    }
+    .phone iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #fff;
+    }
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .preview-pane { position: static; }
     }
     .form-card {
       background: white;
@@ -153,6 +204,54 @@
       color: #999;
       margin-top: 5px;
     }
+    .tpl-cat { margin-bottom: 22px; }
+    .tpl-cat h4 {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .tpl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .tpl-option { cursor: pointer; display: block; position: relative; }
+    .tpl-option input { position: absolute; opacity: 0; pointer-events: none; }
+    .tpl-preview {
+      height: 92px;
+      border-radius: 12px;
+      border: 2px solid #e8e8e8;
+      padding: 12px 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    .tpl-option input:checked + .tpl-preview {
+      border-color: #42a5f5;
+      box-shadow: 0 0 0 3px rgba(66,165,245,0.25);
+    }
+    .tpl-option:hover .tpl-preview { border-color: #90caf9; }
+    .tpl-mini-avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: currentColor; opacity: 0.85;
+    }
+    .tpl-mini-line {
+      height: 4px; width: 56px; border-radius: 4px;
+      background: currentColor; opacity: 0.7;
+    }
+    .tpl-mini-line.short { width: 36px; opacity: 0.4; }
+    .tpl-name {
+      display: block;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: #444;
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -161,7 +260,7 @@
     <a href="/admin/dashboard" class="btn btn-secondary">← Retour</a>
   </div>
 
-  <div class="container">
+  <div class="container layout">
     <div class="form-card">
       <h2><%= card ? 'Modifier la carte' : 'Créer une nouvelle carte' %></h2>
       
@@ -207,18 +306,33 @@
               <input type="color" id="theme_color" name="theme_color" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>" style="width: 60px; height: 40px; cursor: pointer;">
               <input type="text" id="theme_color_text" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>" readonly style="flex: 1; background: #f5f5f5;">
             </div>
-            <div class="help-text">Choisissez la couleur principale de votre carte de profil</div>
+            <div class="help-text">Utilisée comme accent sur certains templates (Classique, Minuit…)</div>
           </div>
         </div>
-        
-        <script>
-          const colorPicker = document.getElementById('theme_color');
-          const colorText = document.getElementById('theme_color_text');
-          colorPicker.addEventListener('input', (e) => {
-            colorText.value = e.target.value;
-          });
-        </script>
 
+        <div class="form-section">
+          <h3>🖼 Template de la carte</h3>
+          <% const selectedTpl = card && card.template ? card.template : 'default'; %>
+          <% categories.forEach(function(cat) { %>
+            <div class="tpl-cat">
+              <h4><%= cat.label %></h4>
+              <div class="tpl-grid">
+                <% templates.filter(function(t) { return t.category === cat.id; }).forEach(function(t) { %>
+                  <label class="tpl-option">
+                    <input type="radio" name="template" value="<%= t.id %>" <%= selectedTpl === t.id ? 'checked' : '' %>>
+                    <div class="tpl-preview" style="background: <%= t.preview.bg %>; color: <%= t.preview.text %>;">
+                      <div class="tpl-mini-avatar" style="background: <%= t.preview.card %>;"></div>
+                      <div class="tpl-mini-line"></div>
+                      <div class="tpl-mini-line short"></div>
+                    </div>
+                    <span class="tpl-name"><%= t.name %></span>
+                  </label>
+                <% }); %>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        
         <div class="form-section">
           <h3>🔗 Réseaux sociaux</h3>
           
@@ -275,6 +389,64 @@
         </div>
       </form>
     </div>
+
+    <aside class="preview-pane">
+      <div class="preview-head">
+        <h3>Aperçu en direct</h3>
+        <a href="/admin/preview" id="preview-open" target="_blank" rel="noopener">Plein écran</a>
+      </div>
+      <div class="phone">
+        <iframe id="tpl-preview-frame" title="Aperçu du template"></iframe>
+      </div>
+      <p class="help-text" style="text-align: center; margin-top: 12px;">Cliquez un template pour le voir. L’aperçu suit aussi vos infos.</p>
+    </aside>
   </div>
+  <script>
+    const form = document.querySelector('form');
+    const frame = document.getElementById('tpl-preview-frame');
+    const openLink = document.getElementById('preview-open');
+    const colorPicker = document.getElementById('theme_color');
+    const colorText = document.getElementById('theme_color_text');
+
+    function formParams() {
+      return new URLSearchParams(new FormData(form));
+    }
+
+    async function refreshPreview() {
+      const params = formParams();
+      openLink.href = '/admin/preview?' + params.toString();
+      const res = await fetch('/admin/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+      });
+      if (!res.ok) return;
+      frame.srcdoc = await res.text();
+    }
+
+    function debounce(fn, ms) {
+      let t;
+      return function () {
+        clearTimeout(t);
+        t = setTimeout(fn, ms);
+      };
+    }
+
+    const refreshSoon = debounce(refreshPreview, 280);
+
+    colorPicker.addEventListener('input', (e) => {
+      colorText.value = e.target.value;
+      refreshPreview();
+    });
+    form.addEventListener('change', (e) => {
+      if (e.target.name === 'template' || e.target.type === 'color') refreshPreview();
+    });
+    form.addEventListener('input', (e) => {
+      if (e.target.type === 'color' || e.target.name === 'template') return;
+      refreshSoon();
+    });
+
+    refreshPreview();
+  </script>
 </body>
 </html>

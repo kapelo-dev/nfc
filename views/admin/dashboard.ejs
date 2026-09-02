@@ -218,6 +218,7 @@
               <th>Nom</th>
               <th>Lien de la carte</th>
               <th>Titre</th>
+              <th>Template</th>
               <th>Statut</th>
               <th>Date de création</th>
               <th>Actions</th>
@@ -235,6 +236,7 @@
                   </a>
                 </td>
                 <td><%= card.title || '-' %></td>
+                <td><%= templateNames[card.template] || card.template || 'Classique' %></td>
                 <td>
                   <span class="status <%= card.is_active ? 'active' : 'inactive' %>">
                     <%= card.is_active ? 'Active' : 'Inactive' %>

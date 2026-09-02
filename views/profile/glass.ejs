@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      overflow: hidden;
+    }
+    .blob {
+      position: fixed; border-radius: 50%; filter: blur(60px); opacity: 0.6;
+    }
+    .b1 { width: 280px; height: 280px; background: #22d3ee; top: -40px; left: -40px; }
+    .b2 { width: 320px; height: 320px; background: #f472b6; bottom: -60px; right: -40px; }
+    .card {
+      position: relative; z-index: 1;
+      max-width: 420px; width: 100%;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 28px;
+      padding: 40px 28px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    }
+    .profile-photo, .default-avatar {
+      width: 110px; height: 110px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 18px;
+      border: 3px solid rgba(255,255,255,0.7);
+    }
+    .profile-photo { display: block; }
+    .default-avatar { background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+    .default-avatar i { font-size: 42px; }
+    .profile-name { font-size: 26px; font-weight: 700; }
+    .profile-title { opacity: 0.9; margin: 6px 0 14px; }
+    .profile-bio { opacity: 0.85; line-height: 1.7; font-size: 14px; margin-bottom: 26px; }
+    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; border-radius: 14px; text-decoration: none; color: #fff;
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      font-weight: 600; font-size: 13px; transition: 0.2s;
+    }
+    .social-link:hover { background: rgba(255,255,255,0.3); }
+    .no-social { opacity: 0.7; }
+    .footer { margin-top: 22px; font-size: 12px; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="card">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">NFC</p>
+  </div>
+</body>
+</html>

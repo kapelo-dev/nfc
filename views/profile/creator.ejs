@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #09090b;
+      min-height: 100vh;
+      display: flex; justify-content: center;
+      padding: 48px 20px;
+      color: #fff;
+    }
+    .card { max-width: 400px; width: 100%; text-align: center; }
+    .profile-photo, .default-avatar {
+      width: 96px; height: 96px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 16px;
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+    }
+    .profile-photo { display: block; }
+    .default-avatar { background: #27272a; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+    .default-avatar i { font-size: 36px; color: #a1a1aa; }
+    .profile-name { font-size: 22px; font-weight: 800; }
+    .profile-title { color: #a1a1aa; font-size: 14px; margin-top: 4px; }
+    .profile-bio { color: #d4d4d8; font-size: 14px; line-height: 1.6; margin: 16px 0 28px; }
+    .social-grid { display: flex; flex-direction: column; gap: 12px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px; border-radius: 14px; text-decoration: none;
+      font-weight: 700; font-size: 15px; color: #fff;
+      background: #18181b; border: 1px solid #27272a;
+      transition: 0.2s;
+    }
+    .social-link:hover { transform: scale(1.02); border-color: #fff; }
+    .instagram { background: linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
+    .tiktok { background: #111; border-color: #25f4ee; }
+    .snapchat { background: #FFFC00; color: #000; border: none; }
+    .whatsapp { background: #25D366; border: none; }
+    .linkedin { background: #0077B5; border: none; }
+    .facebook { background: #1877F2; border: none; }
+    .no-social { color: #52525b; }
+    .footer { margin-top: 32px; font-size: 11px; color: #3f3f46; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">Tous mes liens ✨</p>
+  </div>
+</body>
+</html>

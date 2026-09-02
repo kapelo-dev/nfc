@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #f3eee6;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      max-width: 480px; width: 100%;
+      background: #faf7f2;
+      border: 1px solid #c9a227;
+      padding: 48px 36px 36px;
+      text-align: center;
+    }
+    .ornament { color: #c9a227; letter-spacing: 8px; font-size: 10px; margin-bottom: 24px; }
+    .profile-photo, .default-avatar {
+      width: 108px; height: 108px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 24px;
+      border: 1px solid #c9a227; padding: 4px;
+    }
+    .profile-photo { display: block; background: #faf7f2; }
+    .default-avatar { background: #f3eee6; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
+    .default-avatar i { font-size: 42px; color: #c9a227; }
+    .profile-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px; font-weight: 600; color: #1a1714;
+    }
+    .profile-title {
+      font-weight: 300; letter-spacing: 3px; text-transform: uppercase;
+      font-size: 11px; color: #c9a227; margin: 10px 0 20px;
+    }
+    .profile-bio { color: #5c5346; font-weight: 300; line-height: 1.8; margin-bottom: 32px; }
+    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; text-decoration: none; color: #1a1714;
+      border: 1px solid #e4d9c5; font-size: 13px; font-weight: 400;
+      letter-spacing: 0.5px; transition: 0.2s;
+    }
+    .social-link:hover { border-color: #c9a227; background: #fff; }
+    .social-link i { color: #c9a227; }
+    .no-social { color: #a89b88; }
+    .footer { margin-top: 28px; font-size: 10px; letter-spacing: 2px; color: #c9a227; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="ornament">◆ ◆ ◆</div>
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">Carte privée</p>
+  </div>
+</body>
+</html>

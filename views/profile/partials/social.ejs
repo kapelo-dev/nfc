@@ -1,0 +1,51 @@
+<%
+  const items = [];
+  if (card.snapchat) {
+    items.push({
+      cls: 'snapchat', icon: 'fab fa-snapchat', label: 'Snapchat',
+      href: card.snapchat.startsWith('http') ? card.snapchat : 'https://snapchat.com/add/' + card.snapchat
+    });
+  }
+  if (card.tiktok) {
+    items.push({
+      cls: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok',
+      href: card.tiktok.startsWith('http') ? card.tiktok : 'https://tiktok.com/@' + card.tiktok.replace('@', '')
+    });
+  }
+  if (card.whatsapp) {
+    items.push({
+      cls: 'whatsapp', icon: 'fab fa-whatsapp', label: 'WhatsApp',
+      href: card.whatsapp.startsWith('http') ? card.whatsapp : 'https://wa.me/' + card.whatsapp.replace(/[^0-9]/g, '')
+    });
+  }
+  if (card.linkedin) {
+    items.push({
+      cls: 'linkedin', icon: 'fab fa-linkedin', label: 'LinkedIn',
+      href: card.linkedin.startsWith('http') ? card.linkedin : 'https://linkedin.com/in/' + card.linkedin
+    });
+  }
+  if (card.instagram) {
+    items.push({
+      cls: 'instagram', icon: 'fab fa-instagram', label: 'Instagram',
+      href: card.instagram.startsWith('http') ? card.instagram : 'https://instagram.com/' + card.instagram.replace('@', '')
+    });
+  }
+  if (card.facebook) {
+    items.push({
+      cls: 'facebook', icon: 'fab fa-facebook', label: 'Facebook',
+      href: card.facebook.startsWith('http') ? card.facebook : 'https://facebook.com/' + card.facebook
+    });
+  }
+%>
+<% if (items.length) { %>
+  <div class="social-grid">
+    <% items.forEach(function(item) { %>
+      <a href="<%= item.href %>" target="_blank" rel="noopener" class="social-link <%= item.cls %>">
+        <i class="<%= item.icon %>"></i>
+        <span><%= item.label %></span>
+      </a>
+    <% }); %>
+  </div>
+<% } else { %>
+  <div class="no-social">Aucun réseau social configuré</div>
+<% } %>

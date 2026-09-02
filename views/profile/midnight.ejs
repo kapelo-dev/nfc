@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #050505;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      color: #fff;
+    }
+    .card { max-width: 440px; width: 100%; text-align: center; }
+    .profile-photo, .default-avatar {
+      width: 112px; height: 112px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 22px;
+      border: 2px solid <%= theme.color %>;
+      box-shadow: 0 0 32px <%= theme.light %>;
+    }
+    .profile-photo { display: block; }
+    .default-avatar {
+      background: #111; display: flex; align-items: center; justify-content: center;
+      margin-left: auto; margin-right: auto;
+    }
+    .default-avatar i { font-size: 44px; color: <%= theme.color %>; }
+    .profile-name { font-size: 26px; font-weight: 600; }
+    .profile-title { color: <%= theme.color %>; font-size: 13px; margin-top: 8px; font-weight: 500; }
+    .profile-bio { color: #a1a1aa; font-size: 14px; line-height: 1.7; margin: 20px 0 32px; }
+    .social-grid { display: flex; flex-direction: column; gap: 10px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px; border-radius: 10px; text-decoration: none;
+      color: #fff; background: #141414; border: 1px solid #222;
+      font-size: 14px; font-weight: 500; transition: 0.2s;
+    }
+    .social-link:hover { border-color: <%= theme.color %>; background: #1a1a1a; }
+    .social-link i { color: <%= theme.color %>; }
+    .no-social { color: #555; }
+    .footer { margin-top: 28px; font-size: 11px; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer">NFC Card</p>
+  </div>
+</body>
+</html>

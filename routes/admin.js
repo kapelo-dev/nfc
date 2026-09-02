@@ -4,6 +4,11 @@ const bcrypt = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const db = require('../config/database');
 const { isAuthenticated } = require('../middleware/auth');
+const { categories, templates, resolve, getTheme, buildPreviewCard } = require('../config/templates');
+
+function formLocals(card, error) {
+  return { card, error, templates, categories };
+}
 
 router.get('/login', (req, res) => {
   if (req.session && req.session.isAdmin) {
@@ -43,10 +48,19 @@ router.get('/logout', (req, res) => {
   res.redirect('/admin/login');
 });
 
+function renderPreview(req, res) {
+  const card = buildPreviewCard(req.method === 'GET' ? req.query : req.body);
+  res.render(`profile/${resolve(card.template)}`, { card, theme: getTheme(card) });
+}
+
+router.get('/preview', isAuthenticated, renderPreview);
+router.post('/preview', isAuthenticated, renderPreview);
+
 router.get('/dashboard', isAuthenticated, async (req, res) => {
   try {
     const [cards] = await db.query('SELECT * FROM cards ORDER BY created_at DESC');
-    res.render('admin/dashboard', { cards });
+    const templateNames = Object.fromEntries(templates.map((t) => [t.id, t.name]));
+    res.render('admin/dashboard', { cards, templateNames });
   } catch (error) {
     console.error('Dashboard error:', error);
     res.status(500).send('Erreur serveur');
@@ -54,28 +68,25 @@ router.get('/dashboard', isAuthenticated, async (req, res) => {
 });
 
 router.get('/cards/new', isAuthenticated, (req, res) => {
-  res.render('admin/card-form', { card: null, error: null });
+  res.render('admin/card-form', formLocals(null, null));
 });
 
 router.post('/cards', isAuthenticated, async (req, res) => {
-  const { name, title, bio, photo_url, theme_color, snapchat, tiktok, whatsapp, linkedin, instagram, facebook } = req.body;
+  const { name, title, bio, photo_url, theme_color, template, snapchat, tiktok, whatsapp, linkedin, instagram, facebook } = req.body;
   
   try {
     const cardId = uuidv4().replace(/-/g, '').substring(0, 12);
     
     await db.query(
-      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, snapchat, tiktok, whatsapp, linkedin, instagram, facebook) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [cardId, name, title, bio, photo_url, theme_color || '#42a5f5', snapchat, tiktok, whatsapp, linkedin, instagram, facebook]
+      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, template, snapchat, tiktok, whatsapp, linkedin, instagram, facebook) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [cardId, name, title, bio, photo_url, theme_color || '#42a5f5', resolve(template), snapchat, tiktok, whatsapp, linkedin, instagram, facebook]
     );
     
     res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Create card error:', error);
-    res.render('admin/card-form', { 
-      card: req.body, 
-      error: 'Erreur lors de la création de la carte' 
-    });
+    res.render('admin/card-form', formLocals(req.body, 'Erreur lors de la création de la carte'));
   }
 });
 
@@ -87,7 +98,7 @@ router.get('/cards/:id/edit', isAuthenticated, async (req, res) => {
       return res.status(404).send('Carte non trouvée');
     }
     
-    res.render('admin/card-form', { card: cards[0], error: null });
+    res.render('admin/card-form', formLocals(cards[0], null));
   } catch (error) {
     console.error('Edit card error:', error);
     res.status(500).send('Erreur serveur');
@@ -95,22 +106,19 @@ router.get('/cards/:id/edit', isAuthenticated, async (req, res) => {
 });
 
 router.post('/cards/:id', isAuthenticated, async (req, res) => {
-  const { name, title, bio, photo_url, theme_color, snapchat, tiktok, whatsapp, linkedin, instagram, facebook, is_active } = req.body;
+  const { name, title, bio, photo_url, theme_color, template, snapchat, tiktok, whatsapp, linkedin, instagram, facebook, is_active } = req.body;
   
   try {
     await db.query(
-      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ? WHERE id = ?`,
-      [name, title, bio, photo_url, theme_color || '#42a5f5', snapchat, tiktok, whatsapp, linkedin, instagram, facebook, is_active ? 1 : 0, req.params.id]
+      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, template = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ? WHERE id = ?`,
+      [name, title, bio, photo_url, theme_color || '#42a5f5', resolve(template), snapchat, tiktok, whatsapp, linkedin, instagram, facebook, is_active ? 1 : 0, req.params.id]
     );
     
     res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Update card error:', error);
     const [cards] = await db.query('SELECT * FROM cards WHERE id = ?', [req.params.id]);
-    res.render('admin/card-form', { 
-      card: cards[0], 
-      error: 'Erreur lors de la mise à jour de la carte' 
-    });
+    res.render('admin/card-form', formLocals(cards[0], 'Erreur lors de la mise à jour de la carte'));
   }
 });
 
