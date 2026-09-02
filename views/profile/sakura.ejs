@@ -5,72 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= card.name %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Zen Maru Gothic', sans-serif;
-      background: #fff5f6;
+      font-family: 'Outfit', sans-serif;
+      background: #faf7f6;
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      display: grid; place-items: center;
       padding: 24px;
-      overflow: hidden;
-    }
-    .petal {
-      position: fixed; width: 12px; height: 16px; background: #fda4af;
-      border-radius: 0 80% 0 80%; opacity: 0.55;
-      animation: fall linear infinite;
-    }
-    .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
-    .petal:nth-child(2) { left: 30%; animation-duration: 16s; animation-delay: 2s; background: #fecdd3; }
-    .petal:nth-child(3) { left: 55%; animation-duration: 11s; animation-delay: 1s; }
-    .petal:nth-child(4) { left: 75%; animation-duration: 14s; animation-delay: 3s; background: #fb7185; }
-    .petal:nth-child(5) { left: 88%; animation-duration: 13s; animation-delay: 0.5s; }
-    @keyframes fall {
-      from { transform: translateY(-40px) rotate(0deg); }
-      to { transform: translateY(110vh) rotate(360deg); }
+      color: #3d2c30;
     }
     .card {
-      position: relative; z-index: 1;
-      max-width: 440px; width: 100%;
-      background: rgba(255,255,255,0.9);
-      border: 1px solid #fecdd3;
-      border-radius: 24px;
-      padding: 40px 28px; text-align: center;
-      box-shadow: 0 16px 40px rgba(251, 113, 133, 0.15);
+      width: min(400px, 100%);
+      text-align: center;
+      padding: 48px 24px;
     }
     .profile-photo, .default-avatar {
-      width: 112px; height: 112px; border-radius: 50%;
-      object-fit: cover; margin: 0 auto 18px;
-      border: 3px solid #fda4af;
+      width: 96px; height: 96px; border-radius: 50%;
+      object-fit: cover; margin: 0 auto 28px;
     }
     .profile-photo { display: block; }
-    .default-avatar { background: #fff1f2; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
-    .default-avatar i { font-size: 44px; color: #fb7185; }
-    .profile-name { font-size: 26px; font-weight: 700; color: #9f1239; }
-    .profile-title { color: #e11d48; margin: 6px 0 14px; }
-    .profile-bio { color: #9f1239; line-height: 1.8; font-size: 14px; margin-bottom: 26px; }
-    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .social-link {
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px; border-radius: 14px; text-decoration: none;
-      background: #fff1f2; color: #9f1239; font-weight: 500; font-size: 13px;
-      border: 1px solid #fecdd3; transition: 0.2s;
+    .default-avatar { background: #f1e4e6; display: grid; place-items: center; }
+    .default-avatar i { color: #d4a5ad; }
+    .profile-name {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 2rem; font-weight: 600;
     }
-    .social-link:hover { background: #fb7185; color: #fff; border-color: #fb7185; }
-    .no-social { color: #fda4af; }
-    .footer { margin-top: 22px; font-size: 12px; color: #fda4af; }
+    .profile-title { margin-top: 10px; font-size: 0.8rem; letter-spacing: 0.22em; text-transform: uppercase; color: #c48b94; }
+    .profile-bio { margin: 20px auto 0; max-width: 34ch; font-size: 0.92rem; line-height: 1.85; color: #6b5358; }
+    .social-grid { margin-top: 36px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+    .social-link {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: grid; place-items: center;
+      text-decoration: none; color: #3d2c30;
+      border: 1px solid #ead7da; transition: 0.2s;
+    }
+    .social-link span { display: none; }
+    .social-link:hover { background: #3d2c30; color: #faf7f6; border-color: #3d2c30; }
+    .no-social { margin-top: 28px; color: #c4b0b4; }
   </style>
 </head>
 <body>
-  <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
-  <div class="card">
+  <article class="card">
     <%- include('partials/avatar') %>
     <h1 class="profile-name"><%= card.name %></h1>
     <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
     <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
     <%- include('partials/social') %>
-    <p class="footer">さくら</p>
-  </div>
+  </article>
 </body>
 </html>

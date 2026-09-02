@@ -5,73 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= card.name %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Share Tech Mono', monospace;
-      background: #03030a;
+      font-family: 'IBM Plex Mono', monospace;
+      background: #07070c;
+      background-image:
+        linear-gradient(rgba(34,211,238,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      display: grid; place-items: center;
       padding: 24px;
       color: #e2e8f0;
     }
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.03) 3px);
-      pointer-events: none;
-    }
-    .card {
-      max-width: 440px; width: 100%;
-      border: 1px solid #00f0ff;
-      box-shadow: 0 0 24px rgba(0,240,255,0.25), inset 0 0 40px rgba(255,0,234,0.06);
+    .panel {
+      width: min(420px, 100%);
       padding: 40px 28px;
-      text-align: center;
-      position: relative;
-      background: rgba(5,5,16,0.9);
+      background: rgba(7,7,12,0.86);
+      border: 1px solid rgba(34,211,238,0.28);
+      box-shadow: 0 0 0 1px rgba(255,0,180,0.08), 0 24px 80px rgba(0,0,0,0.55);
     }
     .profile-photo, .default-avatar {
-      width: 100px; height: 100px; border-radius: 8px;
-      object-fit: cover; margin: 0 auto 20px;
-      border: 2px solid #ff00ea;
-      box-shadow: 0 0 20px rgba(255,0,234,0.4);
+      width: 88px; height: 88px; object-fit: cover;
+      border-radius: 4px; margin: 0 auto 22px;
+      border: 1px solid #22d3ee;
     }
     .profile-photo { display: block; }
-    .default-avatar { background: #0a0a18; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
-    .default-avatar i { font-size: 40px; color: #00f0ff; }
+    .default-avatar { background: #0c1220; display: grid; place-items: center; }
+    .default-avatar i { color: #22d3ee; }
     .profile-name {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 22px; color: #00f0ff;
-      text-shadow: 0 0 12px rgba(0,240,255,0.7);
+      font-family: 'Syne', sans-serif;
+      font-size: 1.7rem; font-weight: 800; text-align: center;
+      color: #f8fafc; letter-spacing: -0.03em;
     }
-    .profile-title { color: #ff00ea; font-size: 12px; margin-top: 8px; letter-spacing: 2px; }
-    .profile-bio { color: #94a3b8; font-size: 13px; line-height: 1.7; margin: 18px 0 28px; }
-    .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .profile-title {
+      text-align: center; margin-top: 8px; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase; color: #22d3ee;
+    }
+    .profile-bio {
+      text-align: center; margin: 18px auto 0; max-width: 38ch;
+      font-size: 0.78rem; line-height: 1.7; color: #94a3b8;
+    }
+    .social-grid { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .social-link {
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px; text-decoration: none; color: #00f0ff;
-      border: 1px solid rgba(0,240,255,0.4); font-size: 12px;
-      text-transform: uppercase; letter-spacing: 1px;
-      transition: 0.2s;
+      padding: 12px 8px; text-decoration: none; color: #e2e8f0;
+      border: 1px solid rgba(34,211,238,0.25); font-size: 0.68rem;
+      letter-spacing: 0.08em; text-transform: uppercase; transition: 0.2s;
     }
     .social-link:hover {
-      background: rgba(255,0,234,0.15);
-      border-color: #ff00ea; color: #ff00ea;
-      box-shadow: 0 0 16px rgba(255,0,234,0.35);
+      border-color: #f0abfc; color: #f0abfc;
+      box-shadow: inset 0 0 20px rgba(240,171,252,0.08);
     }
-    .no-social { color: #475569; }
-    .footer { margin-top: 24px; font-size: 10px; color: #334155; letter-spacing: 2px; }
+    .no-social { text-align: center; margin-top: 20px; color: #475569; font-size: 0.75rem; }
   </style>
 </head>
 <body>
-  <div class="card">
+  <article class="panel">
     <%- include('partials/avatar') %>
     <h1 class="profile-name"><%= card.name %></h1>
     <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
     <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
     <%- include('partials/social') %>
-    <p class="footer">// NFC_LINK</p>
-  </div>
+  </article>
 </body>
 </html>

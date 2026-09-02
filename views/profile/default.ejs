@@ -3,85 +3,80 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= card.name %> - Profil</title>
+  <title><%= card.name %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root { --accent: <%= theme.color %>; --r: <%= theme.rgb.r %>; --g: <%= theme.rgb.g %>; --b: <%= theme.rgb.b %>; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, <%= theme.light %> 0%, <%= theme.medium %> 100%);
+      font-family: 'Instrument Sans', system-ui, sans-serif;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      display: grid; place-items: center;
+      padding: 32px 16px;
+      color: #0f172a;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(var(--r),var(--g),var(--b),0.28), transparent 55%),
+        radial-gradient(900px 500px at 110% 110%, rgba(var(--r),var(--g),var(--b),0.18), transparent 50%),
+        #f4f6f8;
     }
-    .profile-card {
-      background: white;
-      border-radius: 30px;
-      box-shadow: 0 30px 80px rgba(0,0,0,0.3);
-      max-width: 500px;
-      width: 100%;
+    .card {
+      width: min(420px, 100%);
+      background: #fff;
+      border: 1px solid rgba(15,23,42,0.06);
+      border-radius: 24px;
       overflow: hidden;
-      animation: fadeIn 0.6s ease-out;
+      animation: rise 0.7s cubic-bezier(0.16,1,0.3,1);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: none; }
     }
-    .profile-header {
-      background: <%= theme.color %>;
-      padding: 40px 30px 30px;
-      text-align: center;
+    .cover {
+      height: 92px;
+      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #0f172a));
     }
+    .inner { padding: 0 28px 32px; text-align: center; }
     .profile-photo, .default-avatar {
-      width: 120px; height: 120px; border-radius: 50%;
-      border: 5px solid white; margin: 0 auto 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 96px; height: 96px; border-radius: 50%;
+      object-fit: cover; display: block;
+      margin: -48px auto 18px;
+      border: 3px solid #fff;
+      background: #eef2f6;
     }
-    .profile-photo { object-fit: cover; display: block; }
-    .default-avatar {
-      background: white; display: flex; align-items: center; justify-content: center;
+    .default-avatar { display: grid; place-items: center; }
+    .default-avatar i { font-size: 32px; color: var(--accent); }
+    .profile-name { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
+    .profile-title {
+      margin-top: 6px; font-size: 0.8rem; font-weight: 500;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
     }
-    .default-avatar i { font-size: 60px; color: <%= theme.color %>; }
-    .profile-name { color: white; font-size: 28px; font-weight: bold; margin-bottom: 8px; }
-    .profile-title { color: rgba(255,255,255,0.9); font-size: 16px; margin-bottom: 15px; }
-    .profile-bio { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
-    .social-links { padding: 30px; }
-    .social-links h3 { color: #333; font-size: 18px; margin-bottom: 20px; text-align: center; }
-    .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+    .profile-bio { margin: 16px auto 0; max-width: 34ch; font-size: 0.92rem; line-height: 1.6; color: #475569; }
+    .social-grid { margin-top: 28px; display: grid; gap: 8px; }
     .social-link {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 15px 20px; border-radius: 12px; text-decoration: none;
-      font-weight: 600; font-size: 14px; transition: all 0.3s;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 16px; border-radius: 12px;
+      text-decoration: none; color: #0f172a;
+      background: #f8fafc; border: 1px solid #eef2f6;
+      font-size: 0.9rem; font-weight: 600;
+      transition: 0.2s ease;
     }
-    .social-link:hover { transform: translateY(-3px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
-    .social-link i { font-size: 20px; }
-    .snapchat { background: #FFFC00; color: #000; }
-    .tiktok { background: #000; color: #fff; }
-    .whatsapp { background: #25D366; color: #fff; }
-    .linkedin { background: #0077B5; color: #fff; }
-    .instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
-    .facebook { background: #1877F2; color: #fff; }
-    .footer { text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #f0f0f0; }
-    .no-social { text-align: center; color: #999; padding: 40px 20px; font-style: italic; }
+    .social-link span { flex: 1; text-align: left; }
+    .social-link i { width: 18px; text-align: center; color: var(--accent); }
+    .social-link:hover { border-color: var(--accent); background: #fff; transform: translateX(3px); }
+    .no-social { margin-top: 24px; color: #94a3b8; font-size: 0.85rem; }
   </style>
 </head>
 <body>
-  <div class="profile-card">
-    <div class="profile-header">
+  <article class="card">
+    <div class="cover"></div>
+    <div class="inner">
       <%- include('partials/avatar') %>
       <h1 class="profile-name"><%= card.name %></h1>
       <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
       <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
-    </div>
-    <div class="social-links">
-      <% const hasSocial = card.snapchat || card.tiktok || card.whatsapp || card.linkedin || card.instagram || card.facebook; %>
-      <% if (hasSocial) { %><h3>Connectez-vous avec moi</h3><% } %>
       <%- include('partials/social') %>
     </div>
-    <div class="footer">Propulsé par NFC Card Manager</div>
-  </div>
+  </article>
 </body>
 </html>

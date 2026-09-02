@@ -5,83 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= card.name %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Source Sans 3', sans-serif;
-      background: #e8eef4;
+      font-family: 'Outfit', sans-serif;
+      background: #ece8e1;
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      display: grid; place-items: center;
       padding: 24px;
+      color: #1c1915;
     }
-    .wrap {
+    .sheet {
+      width: min(720px, 100%);
       display: grid;
-      grid-template-columns: 240px 1fr;
-      max-width: 720px; width: 100%;
-      background: #fff;
-      box-shadow: 0 25px 60px rgba(15,23,42,0.18);
-      min-height: 480px;
+      grid-template-columns: 280px 1fr;
+      min-height: 520px;
+      background: #f7f4ee;
+      border: 1px solid #d9d0c3;
     }
-    .side {
-      background: #0f172a;
-      color: #fff;
-      padding: 40px 28px;
+    .pane {
+      background: #1a2332;
+      color: #f7f4ee;
+      padding: 48px 32px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
       text-align: center;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     .profile-photo, .default-avatar {
-      width: 110px; height: 110px; border-radius: 4px;
-      object-fit: cover; margin-bottom: 20px;
-      border: 2px solid #c9a227;
+      width: 140px; height: 168px; object-fit: cover;
+      border-radius: 0; margin-bottom: 28px;
+      filter: grayscale(0.15) contrast(1.05);
     }
-    .default-avatar { background: #1e293b; display: flex; align-items: center; justify-content: center; }
-    .default-avatar i { font-size: 48px; color: #c9a227; }
+    .profile-photo { display: block; }
+    .default-avatar { background: #243044; display: grid; place-items: center; }
+    .default-avatar i { font-size: 42px; color: #c4a574; }
     .profile-name {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 28px; font-weight: 600; letter-spacing: 0.5px;
+      font-size: 2rem; font-weight: 500; line-height: 1.1;
     }
     .profile-title {
-      color: #c9a227; font-size: 12px; letter-spacing: 2.5px;
-      text-transform: uppercase; margin-top: 10px;
+      margin-top: 12px; font-size: 0.68rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: #c4a574;
     }
-    .main { padding: 48px 40px; display: flex; flex-direction: column; justify-content: center; }
-    .profile-bio { color: #475569; line-height: 1.7; font-size: 15px; margin-bottom: 32px; }
-    .label {
-      font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-      color: #94a3b8; margin-bottom: 16px;
-    }
-    .social-grid { display: flex; flex-direction: column; gap: 10px; }
+    .copy { padding: 56px 44px; display: flex; flex-direction: column; justify-content: center; }
+    .rule { width: 40px; height: 1px; background: #c4a574; margin-bottom: 24px; }
+    .profile-bio { font-size: 0.95rem; line-height: 1.75; color: #5c564c; margin-bottom: 36px; }
+    .kicker { font-size: 0.65rem; letter-spacing: 0.22em; text-transform: uppercase; color: #9a9184; margin-bottom: 16px; }
+    .social-grid { display: flex; flex-direction: column; }
     .social-link {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 16px; text-decoration: none; color: #0f172a;
-      border: 1px solid #e2e8f0; font-weight: 500; font-size: 14px;
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 0; text-decoration: none; color: #1a2332;
+      border-bottom: 1px solid #e6dfd4; font-size: 0.88rem; font-weight: 500;
       transition: 0.2s;
     }
-    .social-link:hover { border-color: #c9a227; background: #faf8f2; }
-    .social-link i { width: 20px; text-align: center; color: #c9a227; }
-    .snapchat i, .tiktok i, .whatsapp i, .linkedin i, .instagram i, .facebook i { color: #c9a227; }
-    .no-social { color: #94a3b8; font-style: italic; }
-    .footer { margin-top: 28px; font-size: 11px; color: #cbd5e1; }
-    @media (max-width: 640px) {
-      .wrap { grid-template-columns: 1fr; }
-      .side { padding: 36px 24px; }
+    .social-link:last-child { border-bottom: 0; }
+    .social-link i { width: 16px; color: #c4a574; font-size: 0.85rem; }
+    .social-link:hover { color: #c4a574; padding-left: 6px; }
+    .no-social { color: #9a9184; }
+    @media (max-width: 680px) {
+      .sheet { grid-template-columns: 1fr; }
+      .pane { padding: 40px 24px; }
+      .copy { padding: 36px 28px 44px; }
+      .profile-photo, .default-avatar { width: 112px; height: 134px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <aside class="side">
+  <article class="sheet">
+    <aside class="pane">
       <%- include('partials/avatar') %>
       <h1 class="profile-name"><%= card.name %></h1>
       <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
     </aside>
-    <div class="main">
+    <div class="copy">
+      <div class="rule"></div>
       <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
-      <p class="label">Contact</p>
+      <p class="kicker">Correspondance</p>
       <%- include('partials/social') %>
-      <p class="footer">NFC Card Manager</p>
     </div>
-  </div>
+  </article>
 </body>
 </html>

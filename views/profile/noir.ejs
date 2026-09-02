@@ -5,58 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= card.name %></title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: 'Barlow', sans-serif;
-      background: #0a0a0a;
+      font-family: 'Source Serif 4', serif;
+      background: #000;
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0;
-      color: #e8e8e8;
+      color: #e8e4dc;
     }
-    .hero {
-      width: 100%; max-width: 560px;
+    .stage {
+      width: min(480px, 100%);
+      margin: 0 auto;
       min-height: 100vh;
-      background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
-      padding: 60px 32px 40px;
-      display: flex; flex-direction: column; align-items: center;
+      display: flex; flex-direction: column;
     }
-    .profile-photo, .default-avatar {
-      width: 140px; height: 180px; border-radius: 0;
-      object-fit: cover; filter: grayscale(1) contrast(1.1);
-      margin-bottom: 28px;
+    .still {
+      height: 42vh; min-height: 240px;
+      background: #111;
+      overflow: hidden;
+      display: grid; place-items: center;
     }
-    .profile-photo { display: block; }
-    .default-avatar { background: #222; display: flex; align-items: center; justify-content: center; }
-    .default-avatar i { font-size: 56px; color: #444; }
+    .profile-photo {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: grayscale(1) contrast(1.15) brightness(0.92);
+    }
+    .default-avatar {
+      width: 100%; height: 100%; background: #161616;
+      display: grid; place-items: center;
+    }
+    .default-avatar i { font-size: 48px; color: #333; }
+    .meta { padding: 36px 28px 48px; }
     .profile-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 48px; letter-spacing: 4px; line-height: 1;
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(2.4rem, 10vw, 3.4rem);
+      font-weight: 500; letter-spacing: 0.04em; line-height: 0.95;
+      text-transform: uppercase;
     }
-    .profile-title { color: #888; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; margin: 8px 0 20px; }
-    .profile-bio { color: #999; max-width: 360px; text-align: center; line-height: 1.7; margin-bottom: 36px; font-size: 15px; }
-    .social-grid { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .profile-title {
+      margin-top: 10px; font-size: 0.78rem; letter-spacing: 0.28em;
+      text-transform: uppercase; color: #8a867c;
+    }
+    .profile-bio { margin-top: 22px; font-size: 1.02rem; line-height: 1.7; color: #c4c0b6; }
+    .social-grid { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 8px; }
     .social-link {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 16px; text-decoration: none; color: #fff;
-      border: 1px solid #333; font-size: 12px; letter-spacing: 1px;
-      text-transform: uppercase; transition: 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px; text-decoration: none; color: #e8e4dc;
+      border: 1px solid #2a2a2a; font-family: 'Oswald', sans-serif;
+      font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
     }
-    .social-link:hover { background: #fff; color: #000; }
-    .no-social { color: #444; }
-    .footer { margin-top: auto; padding-top: 40px; font-size: 10px; letter-spacing: 3px; color: #333; }
+    .social-link:hover { background: #e8e4dc; color: #000; }
+    .no-social { color: #555; }
   </style>
 </head>
 <body>
-  <div class="hero">
-    <%- include('partials/avatar') %>
-    <h1 class="profile-name"><%= card.name %></h1>
-    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
-    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
-    <%- include('partials/social') %>
-    <p class="footer">NFC</p>
+  <div class="stage">
+    <div class="still"><%- include('partials/avatar') %></div>
+    <div class="meta">
+      <h1 class="profile-name"><%= card.name %></h1>
+      <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+      <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+      <%- include('partials/social') %>
+    </div>
   </div>
 </body>
 </html>

@@ -13,49 +13,49 @@
       background: #09090b;
       min-height: 100vh;
       display: flex; justify-content: center;
-      padding: 48px 20px;
-      color: #fff;
+      padding: 56px 16px 40px;
+      color: #fafafa;
     }
-    .card { max-width: 400px; width: 100%; text-align: center; }
+    .card { width: min(380px, 100%); text-align: center; }
+    .avatar-wrap {
+      width: 92px; height: 92px; margin: 0 auto 16px;
+      border-radius: 50%; padding: 3px;
+      background: linear-gradient(135deg, #f59e0b, #ec4899, #8b5cf6, #22d3ee);
+    }
     .profile-photo, .default-avatar {
-      width: 96px; height: 96px; border-radius: 50%;
-      object-fit: cover; margin: 0 auto 16px;
-      outline: 3px solid #fff;
-      outline-offset: 3px;
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+      border: 3px solid #09090b; background: #18181b;
     }
-    .profile-photo { display: block; }
-    .default-avatar { background: #27272a; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto; }
-    .default-avatar i { font-size: 36px; color: #a1a1aa; }
-    .profile-name { font-size: 22px; font-weight: 800; }
-    .profile-title { color: #a1a1aa; font-size: 14px; margin-top: 4px; }
-    .profile-bio { color: #d4d4d8; font-size: 14px; line-height: 1.6; margin: 16px 0 28px; }
-    .social-grid { display: flex; flex-direction: column; gap: 12px; }
+    .default-avatar { display: grid; place-items: center; }
+    .default-avatar i { color: #a1a1aa; }
+    .profile-name { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.03em; }
+    .profile-title { margin-top: 4px; font-size: 0.85rem; color: #a1a1aa; font-weight: 500; }
+    .profile-bio { margin: 14px auto 0; max-width: 36ch; font-size: 0.88rem; line-height: 1.55; color: #d4d4d8; }
+    .social-grid { margin-top: 28px; display: flex; flex-direction: column; gap: 10px; }
     .social-link {
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      padding: 16px; border-radius: 14px; text-decoration: none;
-      font-weight: 700; font-size: 15px; color: #fff;
+      padding: 15px; border-radius: 14px; text-decoration: none;
+      font-weight: 700; font-size: 0.92rem; color: #fff;
       background: #18181b; border: 1px solid #27272a;
-      transition: 0.2s;
+      transition: transform 0.15s ease, border-color 0.15s;
     }
     .social-link:hover { transform: scale(1.02); border-color: #fff; }
-    .instagram { background: linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); border: none; }
-    .tiktok { background: #111; border-color: #25f4ee; }
-    .snapchat { background: #FFFC00; color: #000; border: none; }
-    .whatsapp { background: #25D366; border: none; }
-    .linkedin { background: #0077B5; border: none; }
-    .facebook { background: #1877F2; border: none; }
-    .no-social { color: #52525b; }
-    .footer { margin-top: 32px; font-size: 11px; color: #3f3f46; }
+    .instagram { background: linear-gradient(90deg, #f59e0b, #ec4899, #8b5cf6); border: 0; }
+    .tiktok { border-color: #25f4ee; }
+    .snapchat { background: #facc15; color: #111; border: 0; }
+    .whatsapp { background: #16a34a; border: 0; }
+    .linkedin { background: #0a66c2; border: 0; }
+    .facebook { background: #1877f2; border: 0; }
+    .no-social { margin-top: 24px; color: #52525b; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <%- include('partials/avatar') %>
+  <article class="card">
+    <div class="avatar-wrap"><%- include('partials/avatar') %></div>
     <h1 class="profile-name"><%= card.name %></h1>
     <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
     <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
     <%- include('partials/social') %>
-    <p class="footer">Tous mes liens ✨</p>
-  </div>
+  </article>
 </body>
 </html>
