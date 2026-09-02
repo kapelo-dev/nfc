@@ -96,6 +96,7 @@
     <% } %>
     
     <form method="POST" action="/admin/login">
+      <%- include('partials/csrf') %>
       <div class="form-group">
         <label for="username">Nom d'utilisateur</label>
         <input type="text" id="username" name="username" required autofocus>

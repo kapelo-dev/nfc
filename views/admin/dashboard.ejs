@@ -39,6 +39,7 @@
       border: none;
       cursor: pointer;
       font-size: 14px;
+      font-family: inherit;
     }
     .btn-primary {
       background: white;
@@ -181,7 +182,10 @@
     <h1>🎴 NFC Card Manager</h1>
     <div class="header-actions">
       <a href="/admin/cards/new" class="btn btn-primary">+ Nouvelle carte</a>
-      <a href="/admin/logout" class="btn btn-secondary">Déconnexion</a>
+      <form method="POST" action="/admin/logout" style="display: inline;">
+        <%- include('partials/csrf') %>
+        <button type="submit" class="btn btn-secondary">Déconnexion</button>
+      </form>
     </div>
   </div>
 
@@ -246,8 +250,9 @@
                 <td>
                   <div class="actions">
                     <a href="/admin/cards/<%= card.id %>/edit" class="btn-small btn-edit">Modifier</a>
-                    <form method="POST" action="/admin/cards/<%= card.id %>/delete" style="display: inline;" 
-                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette carte ?');">
+                    <form method="POST" action="/admin/cards/<%= card.id %>/delete" style="display: inline;"
+                          data-confirm="Êtes-vous sûr de vouloir supprimer cette carte ?">
+                      <%- include('partials/csrf') %>
                       <button type="submit" class="btn-small btn-delete">Supprimer</button>
                     </form>
                   </div>
@@ -259,5 +264,6 @@
       <% } %>
     </div>
   </div>
+  <script src="/js/admin.js"></script>
 </body>
 </html>

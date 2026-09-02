@@ -26,6 +26,8 @@ const templates = [
   { id: 'sunset', name: 'Sunset', category: 'influencer', preview: { bg: '#fb923c', card: '#f472b6', text: '#fff' } }
 ];
 
+const { sanitizeThemeColor, sanitizeCardInput } = require('../lib/sanitize');
+
 const ids = new Set(templates.map((t) => t.id));
 
 function resolve(id) {
@@ -33,7 +35,7 @@ function resolve(id) {
 }
 
 function buildPreviewCard(input) {
-  const src = input || {};
+  const src = sanitizeCardInput(input || {});
   const socialKeys = ['snapchat', 'tiktok', 'whatsapp', 'linkedin', 'instagram', 'facebook'];
   const hasSocial = socialKeys.some((k) => src[k]);
   const demo = {
@@ -48,8 +50,8 @@ function buildPreviewCard(input) {
     name: src.name || 'Alex Martin',
     title: src.title || 'Créateur de contenu',
     bio: src.bio || 'Voici un aperçu de votre carte NFC.',
-    photo_url: src.photo_url || '',
-    theme_color: src.theme_color || '#42a5f5',
+    photo_url: src.photo_url,
+    theme_color: src.theme_color,
     template: resolve(src.template)
   };
   socialKeys.forEach((k) => {
@@ -59,8 +61,8 @@ function buildPreviewCard(input) {
 }
 
 function getTheme(card) {
-  const themeColor = (card && card.theme_color) || '#42a5f5';
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(themeColor);
+  const themeColor = sanitizeThemeColor(card && card.theme_color);
+  const result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(themeColor);
   const rgb = result
     ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) }
     : { r: 66, g: 165, b: 245 };

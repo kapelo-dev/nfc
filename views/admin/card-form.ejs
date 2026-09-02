@@ -269,6 +269,7 @@
       <% } %>
       
       <form method="POST" action="<%= card ? `/admin/cards/${card.id}` : '/admin/cards' %>">
+        <%- include('partials/csrf') %>
         <div class="form-section">
           <h3>📋 Informations générales</h3>
           
@@ -401,52 +402,6 @@
       <p class="help-text" style="text-align: center; margin-top: 12px;">Cliquez un template pour le voir. L’aperçu suit aussi vos infos.</p>
     </aside>
   </div>
-  <script>
-    const form = document.querySelector('form');
-    const frame = document.getElementById('tpl-preview-frame');
-    const openLink = document.getElementById('preview-open');
-    const colorPicker = document.getElementById('theme_color');
-    const colorText = document.getElementById('theme_color_text');
-
-    function formParams() {
-      return new URLSearchParams(new FormData(form));
-    }
-
-    async function refreshPreview() {
-      const params = formParams();
-      openLink.href = '/admin/preview?' + params.toString();
-      const res = await fetch('/admin/preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: params
-      });
-      if (!res.ok) return;
-      frame.srcdoc = await res.text();
-    }
-
-    function debounce(fn, ms) {
-      let t;
-      return function () {
-        clearTimeout(t);
-        t = setTimeout(fn, ms);
-      };
-    }
-
-    const refreshSoon = debounce(refreshPreview, 280);
-
-    colorPicker.addEventListener('input', (e) => {
-      colorText.value = e.target.value;
-      refreshPreview();
-    });
-    form.addEventListener('change', (e) => {
-      if (e.target.name === 'template' || e.target.type === 'color') refreshPreview();
-    });
-    form.addEventListener('input', (e) => {
-      if (e.target.type === 'color' || e.target.name === 'template') return;
-      refreshSoon();
-    });
-
-    refreshPreview();
-  </script>
+  <script src="/js/admin-form.js"></script>
 </body>
 </html>

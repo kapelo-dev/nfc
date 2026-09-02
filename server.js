@@ -1,30 +1,64 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const helmet = require('helmet');
 const path = require('path');
-const cors = require('cors');
 require('dotenv').config();
 
+const { requireSessionSecret } = require('./config/env');
+const db = require('./config/database');
 const adminRoutes = require('./routes/admin');
 const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === 'production';
+
+if (isProd) {
+  app.set('trust proxy', 1);
+}
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com', 'https://cdnjs.cloudflare.com'],
+      fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'data:'],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+      frameAncestors: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"]
+    }
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
+
+app.use(express.urlencoded({ extended: true, limit: '32kb' }));
+app.use(express.json({ limit: '32kb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+const sessionStore = new MySQLStore({
+  createDatabaseTable: true,
+  clearExpired: true,
+  endConnectionOnClose: false
+}, db);
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  name: 'nfc.sid',
+  secret: requireSessionSecret(),
+  store: sessionStore,
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production',
+  cookie: {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000
   }
 }));
@@ -33,60 +67,32 @@ app.use('/admin', adminRoutes);
 app.use('/c', profileRoutes);
 
 app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="fr">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>NFC Card Manager</title>
-      <style>
-        body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .container {
-          text-align: center;
-          background: white;
-          padding: 3rem;
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 { color: #333; margin-bottom: 1rem; }
-        p { color: #666; margin-bottom: 2rem; }
-        a {
-          display: inline-block;
-          padding: 12px 30px;
-          background: #667eea;
-          color: white;
-          text-decoration: none;
-          border-radius: 8px;
-          transition: all 0.3s;
-        }
-        a:hover {
-          background: #764ba2;
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>🎴 NFC Card Manager</h1>
-        <p>Gérez vos cartes NFC et profils sociaux</p>
-        <a href="/admin/login">Accéder à l'administration</a>
-      </div>
-    </body>
-    </html>
-  `);
+  res.status(200).type('html').send(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFC Card</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f4f6f8; color: #0f172a; }
+    main { text-align: center; }
+    h1 { font-size: 1.4rem; font-weight: 650; }
+    p { color: #64748b; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>NFC Card</h1>
+    <p>Cartes de profil</p>
+  </main>
+</body>
+</html>`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Admin panel: http://localhost:${PORT}/admin/login`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

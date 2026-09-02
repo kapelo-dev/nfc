@@ -2,17 +2,15 @@ const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+const { dbConfig, requireAdminPassword } = require('../config/env');
+
 async function initDatabase() {
   let connection;
-  
+
   try {
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'nfc_cards_db',
-      port: process.env.DB_PORT || 3306
-    });
+    const password = requireAdminPassword();
+    const username = process.env.ADMIN_USERNAME || 'admin';
+    connection = await mysql.createConnection(dbConfig());
 
     console.log('Connected to MySQL database');
 
@@ -49,15 +47,12 @@ async function initDatabase() {
     `);
     console.log('Admins table created');
 
-    const [admins] = await connection.query('SELECT * FROM admins WHERE username = ?', [process.env.ADMIN_USERNAME || 'admin']);
-    
+    const [admins] = await connection.query('SELECT * FROM admins WHERE username = ?', [username]);
+
     if (admins.length === 0) {
-      const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'admin123', 10);
-      await connection.query('INSERT INTO admins (username, password) VALUES (?, ?)', [
-        process.env.ADMIN_USERNAME || 'admin',
-        hashedPassword
-      ]);
-      console.log('Default admin user created');
+      const hashedPassword = await bcrypt.hash(password, 12);
+      await connection.query('INSERT INTO admins (username, password) VALUES (?, ?)', [username, hashedPassword]);
+      console.log('Admin user created');
     } else {
       console.log('Admin user already exists');
     }
