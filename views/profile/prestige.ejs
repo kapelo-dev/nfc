@@ -43,6 +43,11 @@
     .social-link::after { content: '\203A'; opacity: 0.5; color: var(--accent); transition: all 0.2s; }
     .social-link:hover { border-color: var(--accent); }
     .social-link:hover::after { transform: translateX(3px); opacity: 1; }
+    .social-link-pending { cursor: default; opacity: 0.8; }
+    .social-link-pending:hover { border-color: transparent; }
+    .social-link-pending::after { display: none; }
+    .social-link-pending em { font-style: normal; font-weight: 400; opacity: 0.65; }
+    .social-link i.has-photo { display: inline-block; width: 20px; height: 20px; border-radius: 50%; background-size: cover; background-position: center; color: transparent; }
     .no-social { margin-top: 24px; color: #8a8072; font-size: 0.85rem; }
     .footer-note { margin-top: 40px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #4d453a; }
   </style>

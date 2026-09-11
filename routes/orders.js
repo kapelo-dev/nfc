@@ -64,6 +64,11 @@ function renderPreview(req, res) {
     instagram: fields.instagram,
     facebook: fields.facebook
   };
+  SOCIAL_NETWORKS.forEach((n) => {
+    // A network checked on the order form should show up in the preview right away,
+    // even before a username/link is typed (e.g. when the visitor picks "photo" mode instead).
+    card[`${n}_pending`] = !card[n] && Boolean(source[`${n}_selected`]);
+  });
   res.render(`profile/${card.template}`, { card, theme: getTheme(card) });
 }
 

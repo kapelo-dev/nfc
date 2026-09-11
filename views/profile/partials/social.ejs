@@ -11,12 +11,16 @@
       cls: 'snapchat', icon: 'fab fa-snapchat', label: 'Snapchat',
       href: httpsOrHandle(card.snapchat, 'https://snapchat.com/add/')
     });
+  } else if (card.snapchat_pending) {
+    items.push({ cls: 'snapchat', icon: 'fab fa-snapchat', label: 'Snapchat', network: 'snapchat', pending: true });
   }
   if (card.tiktok) {
     items.push({
       cls: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok',
       href: httpsOrHandle(card.tiktok, 'https://tiktok.com/@', function (v) { return v.replace(/^@/, ''); })
     });
+  } else if (card.tiktok_pending) {
+    items.push({ cls: 'tiktok', icon: 'fab fa-tiktok', label: 'TikTok', network: 'tiktok', pending: true });
   }
   if (card.whatsapp) {
     items.push({
@@ -25,33 +29,48 @@
         ? card.whatsapp
         : 'https://wa.me/' + String(card.whatsapp).replace(/[^0-9]/g, '')
     });
+  } else if (card.whatsapp_pending) {
+    items.push({ cls: 'whatsapp', icon: 'fab fa-whatsapp', label: 'WhatsApp', network: 'whatsapp', pending: true });
   }
   if (card.linkedin) {
     items.push({
       cls: 'linkedin', icon: 'fab fa-linkedin', label: 'LinkedIn',
       href: httpsOrHandle(card.linkedin, 'https://linkedin.com/in/')
     });
+  } else if (card.linkedin_pending) {
+    items.push({ cls: 'linkedin', icon: 'fab fa-linkedin', label: 'LinkedIn', network: 'linkedin', pending: true });
   }
   if (card.instagram) {
     items.push({
       cls: 'instagram', icon: 'fab fa-instagram', label: 'Instagram',
       href: httpsOrHandle(card.instagram, 'https://instagram.com/', function (v) { return v.replace(/^@/, ''); })
     });
+  } else if (card.instagram_pending) {
+    items.push({ cls: 'instagram', icon: 'fab fa-instagram', label: 'Instagram', network: 'instagram', pending: true });
   }
   if (card.facebook) {
     items.push({
       cls: 'facebook', icon: 'fab fa-facebook', label: 'Facebook',
       href: httpsOrHandle(card.facebook, 'https://facebook.com/')
     });
+  } else if (card.facebook_pending) {
+    items.push({ cls: 'facebook', icon: 'fab fa-facebook', label: 'Facebook', network: 'facebook', pending: true });
   }
 %>
 <% if (items.length) { %>
   <div class="social-grid">
     <% items.forEach(function(item) { %>
-      <a href="<%= item.href %>" target="_blank" rel="noopener noreferrer" class="social-link <%= item.cls %>">
-        <i class="<%= item.icon %>"></i>
-        <span><%= item.label %></span>
-      </a>
+      <% if (item.pending) { %>
+        <div class="social-link <%= item.cls %> social-link-pending" data-social-photo-slot="<%= item.network %>">
+          <i class="<%= item.icon %>" data-social-photo-icon></i>
+          <span><%= item.label %> <em>— à confirmer</em></span>
+        </div>
+      <% } else { %>
+        <a href="<%= item.href %>" target="_blank" rel="noopener noreferrer" class="social-link <%= item.cls %>">
+          <i class="<%= item.icon %>"></i>
+          <span><%= item.label %></span>
+        </a>
+      <% } %>
     <% }); %>
   </div>
 <% } else { %>

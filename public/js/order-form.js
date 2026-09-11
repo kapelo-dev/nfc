@@ -113,6 +113,30 @@ document.addEventListener('DOMContentLoaded', function () {
       };
     }
 
+    // File inputs can't travel through the x-www-form-urlencoded preview request, so once the
+    // iframe reloads we inject the locally chosen photo straight into its "pending" social slot.
+    const socialPhotoUrls = {};
+    function injectSocialPhotoPreviews() {
+      const doc = previewFrame.contentDocument;
+      if (!doc) return;
+      document.querySelectorAll('[data-social-block]').forEach(function (block) {
+        const network = block.getAttribute('data-network');
+        const toggle = block.querySelector('[data-social-toggle]');
+        const mode = block.querySelector('[data-social-mode]:checked');
+        const photoInput = block.querySelector('[data-social-photo]');
+        const file = photoInput && photoInput.files && photoInput.files[0];
+        if (!toggle || !toggle.checked || !mode || mode.value !== 'photo' || !file) return;
+        const slot = doc.querySelector('[data-social-photo-slot="' + network + '"] [data-social-photo-icon]');
+        if (!slot) return;
+        if (socialPhotoUrls[network]) URL.revokeObjectURL(socialPhotoUrls[network]);
+        const url = URL.createObjectURL(file);
+        socialPhotoUrls[network] = url;
+        slot.style.backgroundImage = 'url(' + url + ')';
+        slot.classList.add('has-photo');
+      });
+    }
+    previewFrame.addEventListener('load', injectSocialPhotoPreviews);
+
     refreshPreview = async function () {
       const params = new URLSearchParams(new FormData(form));
       const res = await fetch('/commander/preview', {
