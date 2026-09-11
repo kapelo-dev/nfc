@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.querySelector('form');
+  const form = document.getElementById('card_form');
   const frame = document.getElementById('tpl-preview-frame');
   const openLink = document.getElementById('preview-open');
   const colorPicker = document.getElementById('theme_color');
@@ -7,7 +7,12 @@ document.addEventListener('DOMContentLoaded', function () {
   if (!form || !frame) return;
 
   function formParams() {
-    return new URLSearchParams(new FormData(form));
+    const params = new URLSearchParams(new FormData(form));
+    const existingPhoto = form.querySelector('[name="existing_photo_url"]');
+    if (existingPhoto && existingPhoto.value) {
+      params.set('photo_url', existingPhoto.value);
+    }
+    return params;
   }
 
   async function refreshPreview() {
@@ -47,4 +52,53 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   refreshPreview();
+
+  const nameInput = document.getElementById('name');
+  const titleInput = document.getElementById('title');
+  const previewNameEls = document.querySelectorAll('[data-preview-name]');
+  const previewTitleEls = document.querySelectorAll('[data-preview-title]');
+
+  function syncCardPreviewText() {
+    const name = (nameInput && nameInput.value.trim()) || 'Votre nom';
+    const title = (titleInput && titleInput.value.trim()) || 'Titre du poste';
+    previewNameEls.forEach(function (el) { el.textContent = name; });
+    previewTitleEls.forEach(function (el) { el.textContent = title; });
+  }
+
+  if (nameInput) nameInput.addEventListener('input', syncCardPreviewText);
+  if (titleInput) titleInput.addEventListener('input', syncCardPreviewText);
+  syncCardPreviewText();
+
+  const customUploadBlock = document.querySelector('[data-custom-design-upload]');
+  const customDesignInput = document.querySelector('[data-custom-design-input]');
+  const physicalOptions = document.querySelectorAll('[data-physical-option]');
+
+  function syncCustomDesignVisibility() {
+    if (!customUploadBlock) return;
+    const checked = document.querySelector('[data-physical-option]:checked');
+    const isCustom = checked && checked.value === 'custom';
+    customUploadBlock.classList.toggle('hidden', !isCustom);
+    customUploadBlock.classList.toggle('flex', isCustom);
+  }
+
+  physicalOptions.forEach(function (input) {
+    input.addEventListener('change', syncCustomDesignVisibility);
+  });
+  syncCustomDesignVisibility();
+
+  const customDesignRadio = document.querySelector('[data-custom-design-radio]');
+  if (customDesignInput && customDesignRadio) {
+    customDesignInput.addEventListener('change', function () {
+      const file = customDesignInput.files && customDesignInput.files[0];
+      if (!file) return;
+      const tile = customDesignRadio.closest('label').querySelector('[data-card-flip]');
+      const img = tile && tile.querySelector('[data-custom-design-preview]');
+      const placeholder = tile && tile.querySelector('[data-custom-design-placeholder]');
+      if (img) {
+        img.src = URL.createObjectURL(file);
+        img.classList.remove('hidden');
+      }
+      if (placeholder) placeholder.classList.add('hidden');
+    });
+  }
 });

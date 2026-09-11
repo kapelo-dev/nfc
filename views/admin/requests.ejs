@@ -1,0 +1,88 @@
+<%- include('partials/shell-open', { title: 'Demandes de carte', active: 'requests' }) %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<% const socialMeta = {
+  snapchat: { label: 'Snapchat', icon: 'fa-snapchat', color: '#FFFC00' },
+  tiktok: { label: 'TikTok', icon: 'fa-tiktok', color: '#111' },
+  whatsapp: { label: 'WhatsApp', icon: 'fa-whatsapp', color: '#25D366' },
+  linkedin: { label: 'LinkedIn', icon: 'fa-linkedin', color: '#0077B5' },
+  instagram: { label: 'Instagram', icon: 'fa-instagram', color: '#E4405F' },
+  facebook: { label: 'Facebook', icon: 'fa-facebook', color: '#1877F2' }
+}; %>
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1">Demandes de carte</h1>
+    <p class="text-sm text-secondary-foreground">Commandes envoyées via le formulaire public, en attente de vérification</p>
+  </div>
+</div>
+
+<div class="kt-card">
+  <div class="kt-card-content p-0">
+    <% if (cards.length === 0) { %>
+      <div class="flex flex-col items-center text-center gap-3 py-16 px-6">
+        <span class="flex items-center justify-center size-12 rounded-full bg-accent text-muted-foreground">
+          <i class="ki-filled ki-tablet-text-up text-xl"></i>
+        </span>
+        <p class="text-sm text-secondary-foreground">Aucune demande en attente</p>
+      </div>
+    <% } else { %>
+      <div class="flex flex-col divide-y divide-border">
+        <% cards.forEach(function(card) { %>
+          <div class="p-5 flex flex-col lg:flex-row lg:items-center gap-4">
+            <div class="grow min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-1">
+                <span class="text-sm font-semibold text-mono"><%= card.name %></span>
+                <% if (card.title) { %>
+                  <span class="text-xs text-secondary-foreground">· <%= card.title %></span>
+                <% } %>
+                <span class="kt-badge kt-badge-sm kt-badge-warning kt-badge-outline">En attente</span>
+                <% if (card.physical_style) { %><span class="kt-badge kt-badge-sm kt-badge-outline"><i class="ki-filled ki-tablet-text-up"></i> <%= physicalStyleNames[card.physical_style] || card.physical_style %></span><% } %>
+              </div>
+              <div class="flex items-center gap-3 flex-wrap text-xs text-secondary-foreground mb-2.5">
+                <% if (card.contact_email) { %><span><i class="ki-filled ki-sms"></i> <%= card.contact_email %></span><% } %>
+                <% if (card.contact_phone) { %><span><i class="ki-filled ki-phone"></i> <%= card.contact_phone %></span><% } %>
+                <span>Envoyée le <%= new Date(card.created_at).toLocaleDateString('fr-FR') %></span>
+              </div>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <% socialNetworks.forEach(function(n) { const meta = socialMeta[n]; const photo = card[n + '_photo']; const value = card[n]; if (!photo && !value) return; %>
+                  <span class="inline-flex items-center gap-1.5 text-xs rounded-full border border-border px-2 py-1">
+                    <i class="fab <%= meta.icon %>" style="color: <%= meta.color %>;"></i>
+                    <% if (photo) { %>
+                      <a href="<%= photo %>" target="_blank" rel="noopener" class="kt-link">Photo fournie</a>
+                    <% } else { %>
+                      <span class="text-mono"><%= value %></span>
+                    <% } %>
+                  </span>
+                <% }); %>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <a href="/admin/cards/<%= card.id %>/edit" class="kt-btn kt-btn-sm kt-btn-outline" title="Examiner / Modifier">
+                <i class="ki-filled ki-eye"></i>
+                Examiner
+              </a>
+              <form method="POST" action="/admin/requests/<%= card.id %>/approve" class="inline">
+                <%- include('partials/csrf') %>
+                <button type="submit" class="kt-btn kt-btn-sm kt-btn-primary" title="Approuver et activer la carte">
+                  <i class="ki-filled ki-check"></i>
+                  Approuver
+                </button>
+              </form>
+              <form method="POST" action="/admin/cards/<%= card.id %>/delete" class="inline"
+                    data-confirm="Refuser et supprimer cette demande ?">
+                <%- include('partials/csrf') %>
+                <input type="hidden" name="return_to" value="/admin/requests">
+                <button type="submit" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline kt-btn-destructive" title="Rejeter">
+                  <i class="ki-filled ki-cross"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/shell-close') %>

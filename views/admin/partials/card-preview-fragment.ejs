@@ -1,0 +1,22 @@
+<div style="position: relative; width: 320px; height: 202px; max-width: 100%;">
+  <div style="position: absolute; top: 0; left: 0; width: 180px; transform: scale(1.778); transform-origin: top left;">
+    <% if (card.physical_style === 'custom') { %>
+      <%- include('../../partials/custom-design-card', {
+        imageSrc: card.custom_design_url || '',
+        qrSrc: qrSrc,
+        qrCaption: 'Scanner pour<br>commander'
+      }) %>
+    <% } else { %>
+      <%- include('../../partials/physical-card', {
+        s: style,
+        qrSrc: qrSrc,
+        qrCaption: 'Scanner pour<br>commander',
+        previewName: false,
+        previewTitle: false,
+        displayName: card.name,
+        displayTitle: card.title
+      }) %>
+    <% } %>
+  </div>
+</div>
+<p class="text-xs text-secondary-foreground mt-4"><%= styleName %></p>

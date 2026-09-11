@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html class="h-full" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - NFC Card Manager</title>
+  <link rel="stylesheet" href="/metronic/vendors/keenicons/styles.bundle.css">
+  <link rel="stylesheet" href="/metronic/css/styles.css">
+  <% if (typeof extraHead !== 'undefined') { %><%- extraHead %><% } %>
+</head>
+<body class="antialiased h-full text-base text-foreground bg-background">
+  <div class="flex h-full">
+    <aside class="bg-background border-e border-e-border fixed inset-y-0 start-0 z-30 hidden w-[280px] lg:flex flex-col items-stretch shrink-0 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0 bg-background" id="sidebar">
+      <div class="flex items-center justify-between px-5 h-[70px] shrink-0 border-b border-border">
+        <a class="flex items-center gap-2.5 text-mono font-semibold text-base leading-none" href="/admin/dashboard">
+          <span class="flex items-center justify-center size-8 rounded-lg bg-primary/10 text-primary shrink-0">
+            <i class="ki-filled ki-scan-barcode text-base"></i>
+          </span>
+          NFC Card Manager
+        </a>
+        <button class="kt-btn kt-btn-icon kt-btn-ghost lg:hidden" data-kt-drawer-dismiss="true" type="button">
+          <i class="ki-filled ki-cross"></i>
+        </button>
+      </div>
+      <nav class="flex grow shrink-0 flex-col gap-1 py-4 px-3">
+        <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'dashboard' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/dashboard">
+          <i class="ki-filled ki-element-11 text-lg w-5 text-center <%= active === 'dashboard' ? 'text-primary' : 'text-muted-foreground' %>"></i>
+          Tableau de bord
+        </a>
+        <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'requests' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/requests">
+          <i class="ki-filled ki-tablet-text-up text-lg w-5 text-center <%= active === 'requests' ? 'text-primary' : 'text-muted-foreground' %>"></i>
+          Demandes
+          <% if (typeof pendingRequestsCount !== 'undefined' && pendingRequestsCount > 0) { %>
+            <span class="kt-badge kt-badge-sm kt-badge-warning ms-auto"><%= pendingRequestsCount %></span>
+          <% } %>
+        </a>
+        <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'print-queue' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/print-queue">
+          <i class="ki-filled ki-printer text-lg w-5 text-center <%= active === 'print-queue' ? 'text-primary' : 'text-muted-foreground' %>"></i>
+          À imprimer
+          <% if (typeof pendingPrintCount !== 'undefined' && pendingPrintCount > 0) { %>
+            <span class="kt-badge kt-badge-sm kt-badge-info ms-auto"><%= pendingPrintCount %></span>
+          <% } %>
+        </a>
+        <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'cards' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/cards/new">
+          <i class="ki-filled ki-plus-circle text-lg w-5 text-center <%= active === 'cards' ? 'text-primary' : 'text-muted-foreground' %>"></i>
+          Nouvelle carte
+        </a>
+      </nav>
+    </aside>
+
+    <div class="flex flex-col grow lg:ps-[280px] min-h-full">
+      <header class="sticky top-0 z-20 flex items-stretch shrink-0 bg-background border-b border-border">
+        <div class="flex justify-between items-center gap-4 px-4 lg:px-6 w-full h-[70px]">
+          <div class="flex items-center gap-2.5">
+            <button class="kt-btn kt-btn-icon kt-btn-ghost lg:hidden" data-kt-drawer-toggle="#sidebar" type="button">
+              <i class="ki-filled ki-burger-menu text-lg"></i>
+            </button>
+            <span class="text-base font-medium text-mono lg:hidden">NFC Card Manager</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div data-kt-dropdown="true" data-kt-dropdown-placement="bottom-end" data-kt-dropdown-trigger="click">
+              <button class="kt-btn kt-btn-ghost kt-btn-icon rounded-full size-9" data-kt-dropdown-toggle="true" type="button">
+                <span class="flex items-center justify-center size-9 rounded-full bg-primary/10 text-primary">
+                  <i class="ki-filled ki-user-square text-lg"></i>
+                </span>
+              </button>
+              <div class="kt-dropdown-menu w-[220px]" data-kt-dropdown-menu="true">
+                <div class="px-2.5 py-2">
+                  <span class="text-sm font-medium text-foreground">Administrateur</span>
+                </div>
+                <ul class="kt-dropdown-menu-sub">
+                  <li><div class="kt-dropdown-menu-separator"></div></li>
+                  <li>
+                    <form method="POST" action="/admin/logout">
+                      <%- include('csrf') %>
+                      <button class="kt-dropdown-menu-link w-full text-start" type="submit">
+                        <i class="ki-filled ki-exit-right"></i>
+                        Déconnexion
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="grow">
+        <div class="mx-auto w-full max-w-[1400px] py-6 px-4 lg:px-6">

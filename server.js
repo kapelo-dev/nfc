@@ -9,6 +9,8 @@ const { requireSessionSecret } = require('./config/env');
 const db = require('./config/database');
 const adminRoutes = require('./routes/admin');
 const profileRoutes = require('./routes/profile');
+const uploadRoutes = require('./routes/upload');
+const orderRoutes = require('./routes/orders');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -64,6 +66,8 @@ app.use(session({
 }));
 
 app.use('/admin', adminRoutes);
+app.use('/upload', uploadRoutes);
+app.use('/commander', orderRoutes);
 app.use('/c', profileRoutes);
 
 app.get('/', (req, res) => {

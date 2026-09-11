@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent: <%= theme.color %>; --r: <%= theme.rgb.r %>; --g: <%= theme.rgb.g %>; --b: <%= theme.rgb.b %>; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Hanken Grotesk', sans-serif; background: #eef0f2; display: flex; justify-content: center; color: #1b1d21; }
+    .wrap { width: min(390px, 100%); padding-bottom: 40px; }
+    .hero {
+      margin: 24px 20px 0; border-radius: 22px; aspect-ratio: 1.586 / 1; position: relative; overflow: hidden;
+      box-shadow: 0 24px 48px -18px rgba(15,17,21,0.45);
+      background:
+        radial-gradient(140% 140% at 100% 0%, rgba(var(--r),var(--g),var(--b),0.35), transparent 55%),
+        linear-gradient(135deg, #23262b, #14161a 70%);
+    }
+    .hero-inner { position: absolute; inset: 0; padding: 22px 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .hero-top { display: flex; align-items: center; justify-content: space-between; }
+    .hero-chip { color: var(--accent); opacity: 0.9; }
+    .hero-label { font-family: 'Sora', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.16em; color: rgba(var(--r),var(--g),var(--b),0.85); }
+    .hero-name { font-family: 'Sora', sans-serif; font-weight: 600; font-size: 23px; color: #fff; letter-spacing: -0.01em; }
+    .hero-title { margin-top: 6px; font-size: 12.5px; font-weight: 500; color: rgba(var(--r),var(--g),var(--b),0.85); }
+    .avatar-wrap { margin: -26px 32px 0; position: relative; display: flex; justify-content: center; }
+    .profile-photo, .default-avatar {
+      width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
+      background: #fff; padding: 4px; box-shadow: 0 8px 20px -6px rgba(15,17,21,0.35);
+    }
+    .default-avatar { display: grid; place-items: center; background: #fff; }
+    .default-avatar i { font-size: 28px; color: #8a8f98; }
+    .profile-bio { margin: 20px 32px 0; font-size: 14.5px; line-height: 1.65; text-align: center; color: #4b5058; }
+    .social-grid {
+      margin: 28px 20px 0; background: #fff; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 1px 2px rgba(15,17,21,0.04), 0 12px 28px -20px rgba(15,17,21,0.25);
+      display: flex; flex-direction: column;
+    }
+    .social-link { display: flex; align-items: center; gap: 13px; padding: 15px 18px; text-decoration: none; color: inherit; border-bottom: 1px solid #f0f1f3; transition: background 0.15s; }
+    .social-grid a:last-child { border-bottom: none; }
+    .social-link:hover { background: #f8f9fa; }
+    .social-link i { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: #f4f5f7; color: #23262b; font-size: 14px; flex-shrink: 0; }
+    .social-link span { flex: 1; font-size: 14px; font-weight: 600; }
+    .no-social { margin: 28px 32px 0; text-align: center; color: #9aa0a8; font-size: 0.85rem; }
+    .footer-note { margin-top: 22px; text-align: center; font-size: 11px; letter-spacing: 0.08em; color: #a3a8b0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="hero-top">
+          <svg class="hero-chip" width="26" height="18" viewBox="0 0 26 18" fill="none"><rect x="0.5" y="0.5" width="25" height="17" rx="3" stroke="currentColor" stroke-opacity="0.9"/><circle cx="13" cy="9" r="3.4" stroke="currentColor"/></svg>
+          <span class="hero-label">NFC CARD</span>
+        </div>
+        <div>
+          <h1 class="hero-name"><%= card.name %></h1>
+          <% if (card.title) { %><p class="hero-title"><%= card.title %></p><% } %>
+        </div>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+      <%- include('partials/avatar') %>
+    </div>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer-note">Scann&#233; via NFC</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "../../node_modules/@keenthemes/ktui/styles/vars.css";
+@import "../../node_modules/@keenthemes/ktui/styles.css";
+
+@source "../../views/**/*.ejs";
+@source "../../public/js/**/*.js";

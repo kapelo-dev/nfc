@@ -1,0 +1,24 @@
+<div class="card-flip relative rounded-xl ring-2 ring-transparent peer-checked:ring-primary transition-all" style="aspect-ratio: 1.586 / 1; perspective: 800px;" data-card-flip>
+  <div class="card-flip-inner relative w-full h-full transition-transform duration-500" style="transform-style: preserve-3d;" data-card-inner>
+    <div class="absolute inset-0 rounded-xl overflow-hidden shadow-md flex items-center justify-center" style="backface-visibility: hidden; background: #f4f4f5;">
+      <% if (imageSrc) { %>
+        <img src="<%= imageSrc %>" alt="Design personnalisé" class="w-full h-full object-cover" data-custom-design-preview>
+      <% } else { %>
+        <div class="flex flex-col items-center gap-1.5 text-muted-foreground px-3 text-center" data-custom-design-placeholder>
+          <i class="ki-filled ki-picture text-xl"></i>
+          <span class="text-[10px] font-medium">Uploadez votre design</span>
+        </div>
+        <img src="" alt="Design personnalisé" class="w-full h-full object-cover hidden" data-custom-design-preview>
+      <% } %>
+    </div>
+    <div class="absolute inset-0 rounded-xl flex flex-col items-center justify-center gap-1 p-2" style="backface-visibility: hidden; transform: rotateY(180deg); background: #1a1a1a;">
+      <div class="bg-white rounded-md p-1">
+        <img src="<%= qrSrc %>" alt="QR code" style="width: 54px; height: 54px; display: block;">
+      </div>
+      <span class="text-[8px] font-medium text-center leading-tight text-white"><%- qrCaption %></span>
+    </div>
+  </div>
+  <button type="button" class="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/30 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/50 transition-colors" data-flip-trigger aria-label="Voir le verso">
+    <i class="ki-filled ki-arrows-circle text-[11px]"></i>
+  </button>
+</div>

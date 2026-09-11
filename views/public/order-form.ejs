@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="h-full" lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commander ma carte NFC</title>
+  <link rel="stylesheet" href="/metronic/vendors/keenicons/styles.bundle.css">
+  <link rel="stylesheet" href="/metronic/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&family=Quicksand:wght@600;700&family=Sora:wght@600;700&family=Bodoni+Moda:ital,wght@1,600&family=Orbitron:wght@700&family=Fredoka:wght@600;700&family=Lora:ital,wght@1,600&family=Rajdhani:wght@600;700&family=Alex+Brush&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased h-full text-base text-foreground bg-background">
+  <% const socialMeta = {
+    snapchat: { label: 'Snapchat', icon: 'fa-snapchat', color: '#FFFC00', placeholder: "Nom d'utilisateur" },
+    tiktok: { label: 'TikTok', icon: 'fa-tiktok', color: '#111', placeholder: '@utilisateur' },
+    whatsapp: { label: 'WhatsApp', icon: 'fa-whatsapp', color: '#25D366', placeholder: 'Numéro de téléphone' },
+    linkedin: { label: 'LinkedIn', icon: 'fa-linkedin', color: '#0077B5', placeholder: 'URL du profil' },
+    instagram: { label: 'Instagram', icon: 'fa-instagram', color: '#E4405F', placeholder: '@utilisateur' },
+    facebook: { label: 'Facebook', icon: 'fa-facebook', color: '#1877F2', placeholder: 'URL du profil' }
+  }; %>
+
+  <div class="mx-auto w-full max-w-[760px] px-4 py-10">
+    <div class="flex justify-center mb-6">
+      <a class="kt-btn kt-btn-outline gap-2" style="border-color:#25D366; color:#128C4A;" href="https://wa.me/22897223445?text=Bonjour%2C%20je%20voudrais%20commander%20une%20carte%20NFC" target="_blank" rel="noopener">
+        <i class="fab fa-whatsapp text-base" style="color:#25D366;"></i>
+        Je préfère commander sur WhatsApp
+      </a>
+    </div>
+
+    <div class="text-center mb-8">
+      <span class="flex items-center justify-center size-12 rounded-xl bg-primary/10 text-primary mx-auto mb-3">
+        <i class="ki-filled ki-scan-barcode text-2xl"></i>
+      </span>
+      <h1 class="text-xl font-semibold text-mono leading-none mb-2">Commander ma carte NFC</h1>
+      <p class="text-sm text-secondary-foreground">Renseignez vos informations, votre demande sera vérifiée par notre équipe avant activation de la carte.</p>
+    </div>
+
+    <% if (success) { %>
+      <div class="kt-card">
+        <div class="kt-card-content flex flex-col items-center text-center gap-3 p-10">
+          <span class="flex items-center justify-center size-12 rounded-full bg-success/10 text-success">
+            <i class="ki-filled ki-check-circle text-2xl"></i>
+          </span>
+          <h2 class="text-lg font-semibold text-mono">Demande envoyée</h2>
+          <p class="text-sm text-secondary-foreground max-w-[420px]">Merci ! Votre demande a bien été reçue. Notre équipe va vérifier les informations et vous recontactera avant d'activer votre carte.</p>
+        </div>
+      </div>
+    <% } else { %>
+
+    <div class="kt-card">
+      <div class="kt-card-content p-6 lg:p-8">
+        <% if (error) { %>
+          <div class="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 text-destructive text-sm px-3 py-2.5 mb-6">
+            <i class="ki-filled ki-information-2 text-base shrink-0"></i>
+            <span><%= error %></span>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/commander" enctype="multipart/form-data" id="order_form" class="flex flex-col gap-8">
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="flex items-center justify-center size-6 rounded-full bg-primary text-primary-foreground text-xs font-semibold shrink-0" data-step-dot="1">1</span>
+              <div class="h-px flex-1 bg-border"></div>
+              <span class="flex items-center justify-center size-6 rounded-full bg-muted text-muted-foreground text-xs font-semibold shrink-0" data-step-dot="2">2</span>
+            </div>
+            <p class="text-xs font-semibold text-secondary-foreground uppercase tracking-wide mt-2" data-step-label>Étape 1 sur 2 — Vos informations</p>
+          </div>
+
+          <div data-step="1" class="flex flex-col gap-8">
+
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Vos informations
+            </h3>
+            <div class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="name">Nom complet *</label>
+                <input class="kt-input" id="name" name="name" type="text" value="<%= fields.name || '' %>" required>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="title">Titre / Profession</label>
+                <input class="kt-input" id="title" name="title" type="text" value="<%= fields.title || '' %>" placeholder="Ex: Développeur Web">
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="bio">Biographie</label>
+                <textarea class="kt-textarea min-h-[90px]" id="bio" name="bio" placeholder="Quelques mots sur vous..."><%= fields.bio || '' %></textarea>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="photo">Photo de profil</label>
+                <input class="kt-input" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Comment vous recontacter
+            </h3>
+            <p class="text-xs text-secondary-foreground mb-3">Nous vous recontacterons sur WhatsApp pour valider votre commande.</p>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="contact_phone"><i class="fab fa-whatsapp" style="color:#25D366;"></i>Numéro WhatsApp *</label>
+              <input class="kt-input" id="contact_phone" name="contact_phone" type="tel" value="<%= fields.contact_phone || '' %>" placeholder="+33 6 00 00 00 00" required>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Réseaux sociaux
+            </h3>
+            <p class="text-xs text-secondary-foreground mb-4">Sélectionnez les réseaux à afficher sur votre carte. Pour chacun, indiquez votre nom d'utilisateur ou joignez une photo de votre compte (utile si vous ne connaissez pas votre lien exact).</p>
+            <div class="flex flex-col gap-3">
+              <% socialNetworks.forEach(function(n) { const meta = socialMeta[n]; %>
+                <div class="rounded-lg border border-border p-4" data-social-block data-network="<%= n %>">
+                  <label class="flex items-center gap-2.5 cursor-pointer">
+                    <input class="kt-checkbox" type="checkbox" name="<%= n %>_selected" value="1" data-social-toggle <%= fields[n] ? 'checked' : '' %>>
+                    <i class="fab <%= meta.icon %>" style="color: <%= meta.color %>;"></i>
+                    <span class="text-sm font-medium text-mono"><%= meta.label %></span>
+                  </label>
+
+                  <div class="mt-3 pl-6 hidden flex-col gap-3" data-social-details>
+                    <div class="flex items-center gap-4">
+                      <label class="flex items-center gap-1.5 text-xs text-secondary-foreground cursor-pointer">
+                        <input type="radio" name="<%= n %>_mode" value="username" data-social-mode checked>
+                        Nom d'utilisateur / lien
+                      </label>
+                      <label class="flex items-center gap-1.5 text-xs text-secondary-foreground cursor-pointer">
+                        <input type="radio" name="<%= n %>_mode" value="photo" data-social-mode>
+                        Photo du compte
+                      </label>
+                    </div>
+                    <input class="kt-input" type="text" name="<%= n %>" placeholder="<%= meta.placeholder %>" data-social-username value="<%= fields[n] || '' %>">
+                    <input class="kt-input hidden" type="file" name="<%= n %>_photo" accept="image/jpeg,image/png,image/gif,image/webp" data-social-photo>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-6 border-t border-border">
+            <button class="kt-btn kt-btn-primary grow justify-center" type="button" data-step-next>Suivant : choisir le design</button>
+          </div>
+
+          </div>
+
+          <div data-step="2" hidden class="flex flex-col gap-8">
+
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Style de la page web
+            </h3>
+            <p class="text-xs text-secondary-foreground mb-4">L'apparence de votre profil en ligne (celui que les gens verront en scannant votre carte).</p>
+
+            <div class="flex flex-col gap-1 mb-5 max-w-[240px]">
+              <label class="kt-form-label font-normal text-mono" for="theme_color">Couleur du thème</label>
+              <div class="flex items-center gap-2.5">
+                <input class="h-10 w-14 rounded-md border border-input cursor-pointer shrink-0" id="theme_color" name="theme_color" type="color" value="<%= fields.theme_color || '#42a5f5' %>">
+                <input class="kt-input bg-muted text-muted-foreground" id="theme_color_text" type="text" value="<%= fields.theme_color || '#42a5f5' %>" readonly>
+              </div>
+              <span class="text-xs text-secondary-foreground">Utilisée comme accent sur votre profil (aperçu ci-dessous).</span>
+            </div>
+
+            <% const selectedTpl = fields.template || 'default'; %>
+            <div class="flex flex-col gap-5">
+              <% categories.forEach(function(cat) { %>
+                <% const catTemplates = templates.filter(function(t) { return t.category === cat.id; }); %>
+                <% if (catTemplates.length) { %>
+                <div>
+                  <h4 class="text-xs font-semibold text-secondary-foreground uppercase tracking-wide mb-2.5"><%= cat.label %></h4>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <% catTemplates.forEach(function(t) { %>
+                      <label class="flex flex-col cursor-pointer">
+                        <input class="peer sr-only" type="radio" name="template" value="<%= t.id %>" <%= selectedTpl === t.id ? 'checked' : '' %>>
+                        <div class="flex flex-col items-center justify-center gap-1.5 h-[86px] rounded-lg border-2 border-border px-2.5 py-2 transition-all peer-checked:border-primary peer-checked:ring-2 peer-checked:ring-primary/20 hover:border-primary/50" style="background: <%= t.preview.bg %>; color: <%= t.preview.text %>;">
+                          <div class="size-5 rounded-full opacity-85" style="background: <%= t.preview.card %>;"></div>
+                          <div class="h-1 w-12 rounded-full opacity-70" style="background: currentColor;"></div>
+                          <div class="h-1 w-8 rounded-full opacity-40" style="background: currentColor;"></div>
+                        </div>
+                        <span class="block text-center text-xs font-medium text-mono mt-1.5"><%= t.name %></span>
+                      </label>
+                    <% }); %>
+                  </div>
+                </div>
+                <% } %>
+              <% }); %>
+            </div>
+
+            <div class="flex flex-col items-center gap-2 mt-5">
+              <div class="relative rounded-[22px] border-[6px] border-mono overflow-hidden bg-mono shadow-md" style="width: 200px; height: 400px;">
+                <div style="width: 390px; height: 780px; transform: scale(0.5128); transform-origin: top left;">
+                  <iframe class="bg-background" id="tpl-preview-frame" title="Aperçu du profil" style="width: 390px; height: 780px; border: 0; display: block;"></iframe>
+                </div>
+              </div>
+              <p class="text-xs text-secondary-foreground">Aperçu en direct — taille réelle d'un téléphone</p>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Design physique de la carte
+            </h3>
+            <p class="text-xs text-secondary-foreground mb-4">L'apparence de la carte NFC elle-même (recto/verso). Retournez une carte pour voir son verso : chaque design a son propre QR code, à scanner pour commander directement ce design.</p>
+            <% const selectedPhysical = fields.physical_style || physicalStyles[0].id; %>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <% physicalStyles.forEach(function(s) { %>
+                <label class="flex flex-col cursor-pointer">
+                  <input class="peer sr-only" type="radio" name="physical_style" value="<%= s.id %>" data-physical-option <%= selectedPhysical === s.id ? 'checked' : '' %>>
+                  <%- include('../partials/physical-card', { s, qrSrc: qrCodes[s.id], qrCaption: 'Scanner pour<br>commander', previewName: true, previewTitle: true, displayName: '', displayTitle: '' }) %>
+                  <span class="block text-center text-xs font-medium text-mono mt-1.5"><%= s.name %></span>
+                </label>
+              <% }); %>
+              <label class="flex flex-col cursor-pointer">
+                <input class="peer sr-only" type="radio" name="physical_style" value="custom" data-physical-option data-custom-design-radio <%= selectedPhysical === 'custom' ? 'checked' : '' %>>
+                <%- include('../partials/custom-design-card', { imageSrc: '', qrSrc: qrCodes['custom'], qrCaption: 'Scanner pour<br>commander' }) %>
+                <span class="block text-center text-xs font-medium text-mono mt-1.5">Mon propre design</span>
+              </label>
+            </div>
+
+            <div class="mt-4 <%= selectedPhysical === 'custom' ? 'flex' : 'hidden' %> flex-col gap-1" data-custom-design-upload>
+              <label class="kt-form-label font-normal text-mono" for="custom_design_photo">Votre visuel (recto de la carte)</label>
+              <input class="kt-input" id="custom_design_photo" name="custom_design_photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" data-custom-design-input>
+              <span class="text-xs text-secondary-foreground">Format recommandé proche d'une carte de crédit (largeur ≈ 1,6× la hauteur), haute résolution.</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 pt-6 border-t border-border">
+            <button class="kt-btn kt-btn-outline" type="button" data-step-back>Précédent</button>
+            <button class="kt-btn kt-btn-primary grow justify-center" type="submit">Envoyer ma demande</button>
+          </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+    <% } %>
+  </div>
+  <script src="/js/order-form.js"></script>
+  <script src="/metronic/js/ktui.min.js"></script>
+</body>
+</html>

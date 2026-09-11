@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= card.name %></title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --accent: <%= theme.color %>; --r: <%= theme.rgb.r %>; --g: <%= theme.rgb.g %>; --b: <%= theme.rgb.b %>; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Manrope', sans-serif;
+      min-height: 100vh;
+      display: flex; justify-content: center;
+      background: #0f0c09;
+      background-image: radial-gradient(600px 320px at 50% -10%, rgba(var(--r),var(--g),var(--b),0.16), transparent 60%);
+      color: #f2ece1;
+    }
+    .wrap { width: min(390px, 100%); display: flex; flex-direction: column; align-items: center; padding: 56px 28px 48px; }
+    .profile-photo, .default-avatar {
+      width: 104px; height: 104px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0;
+      border: 3px solid var(--accent);
+      background: #1a1512;
+    }
+    .default-avatar { display: grid; place-items: center; }
+    .default-avatar i { font-size: 34px; color: var(--accent); }
+    .profile-name { margin: 22px 0 0; font-family: 'Bodoni Moda', serif; font-weight: 500; font-size: 32px; text-align: center; line-height: 1.1; }
+    .profile-title { margin: 12px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase; color: var(--accent); }
+    .rule { width: 34px; height: 1px; background: rgba(var(--r),var(--g),var(--b),0.55); margin: 26px 0; }
+    .profile-bio { font-family: 'Bodoni Moda', serif; font-style: italic; font-size: 15px; line-height: 1.65; text-align: center; color: #cfc4b3; max-width: 30ch; }
+    .social-grid { width: 100%; margin-top: 40px; display: flex; flex-direction: column; }
+    .social-link {
+      display: flex; align-items: center; gap: 14px;
+      padding: 15px 4px; text-decoration: none; color: inherit;
+      border-top: 1px solid #262019; font-size: 14px; font-weight: 500;
+      transition: border-color 0.2s;
+    }
+    .social-grid a:last-child { border-bottom: 1px solid #262019; }
+    .social-link i { color: var(--accent); width: 17px; text-align: center; }
+    .social-link span { flex: 1; }
+    .social-link::after { content: '\203A'; opacity: 0.5; color: var(--accent); transition: all 0.2s; }
+    .social-link:hover { border-color: var(--accent); }
+    .social-link:hover::after { transform: translateX(3px); opacity: 1; }
+    .no-social { margin-top: 24px; color: #8a8072; font-size: 0.85rem; }
+    .footer-note { margin-top: 40px; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #4d453a; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <%- include('partials/avatar') %>
+    <h1 class="profile-name"><%= card.name %></h1>
+    <% if (card.title) { %><p class="profile-title"><%= card.title %></p><% } %>
+    <div class="rule"></div>
+    <% if (card.bio) { %><p class="profile-bio"><%= card.bio %></p><% } %>
+    <%- include('partials/social') %>
+    <p class="footer-note">Carte NFC</p>
+  </div>
+</body>
+</html>

@@ -1,114 +1,54 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html class="h-full" lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Connexion Admin - NFC Card Manager</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e3f2fd 0%, #90caf9 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .login-container {
-      background: white;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      width: 100%;
-      max-width: 400px;
-    }
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .subtitle {
-      color: #666;
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 500;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 14px;
-      transition: border-color 0.3s;
-    }
-    input:focus {
-      outline: none;
-      border-color: #42a5f5;
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #42a5f5;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    button:hover {
-      background: #1e88e5;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .error {
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid #c33;
-    }
-  </style>
+  <link rel="stylesheet" href="/metronic/vendors/keenicons/styles.bundle.css">
+  <link rel="stylesheet" href="/metronic/css/styles.css">
 </head>
-<body>
-  <div class="login-container">
-    <h1>🔐 Connexion Admin</h1>
-    <p class="subtitle">NFC Card Manager</p>
-    
-    <% if (error) { %>
-      <div class="error"><%= error %></div>
-    <% } %>
-    
-    <form method="POST" action="/admin/login">
-      <%- include('partials/csrf') %>
-      <div class="form-group">
-        <label for="username">Nom d'utilisateur</label>
-        <input type="text" id="username" name="username" required autofocus>
+<body class="antialiased flex h-full text-base text-foreground bg-background">
+  <div class="flex items-center justify-center grow bg-accent/40 p-4">
+    <div class="kt-card max-w-[400px] w-full">
+      <div class="kt-card-content flex flex-col gap-5 p-10">
+        <div class="text-center mb-1">
+          <div class="flex justify-center mb-3">
+            <span class="flex items-center justify-center size-12 rounded-xl bg-primary/10 text-primary">
+              <i class="ki-filled ki-scan-barcode text-2xl"></i>
+            </span>
+          </div>
+          <h3 class="text-lg font-semibold text-mono leading-none mb-2.5">Connexion Admin</h3>
+          <p class="text-sm text-secondary-foreground">NFC Card Manager</p>
+        </div>
+
+        <% if (error) { %>
+          <div class="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 text-destructive text-sm px-3 py-2.5">
+            <i class="ki-filled ki-information-2 text-base shrink-0"></i>
+            <span><%= error %></span>
+          </div>
+        <% } %>
+
+        <form method="POST" action="/admin/login" class="flex flex-col gap-4">
+          <%- include('partials/csrf') %>
+          <div class="flex flex-col gap-1">
+            <label class="kt-form-label font-normal text-mono" for="username">Nom d'utilisateur</label>
+            <input class="kt-input" id="username" name="username" type="text" required autofocus>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="kt-form-label font-normal text-mono" for="password">Mot de passe</label>
+            <div class="kt-input" data-kt-toggle-password="true">
+              <input id="password" name="password" type="password" required>
+              <button class="kt-btn kt-btn-sm kt-btn-ghost kt-btn-icon bg-transparent! -me-1.5" data-kt-toggle-password-trigger="true" type="button">
+                <span class="kt-toggle-password-active:hidden"><i class="ki-filled ki-eye text-muted-foreground"></i></span>
+                <span class="hidden kt-toggle-password-active:block"><i class="ki-filled ki-eye-slash text-muted-foreground"></i></span>
+              </button>
+            </div>
+          </div>
+          <button class="kt-btn kt-btn-primary flex justify-center grow" type="submit">Se connecter</button>
+        </form>
       </div>
-      
-      <div class="form-group">
-        <label for="password">Mot de passe</label>
-        <input type="password" id="password" name="password" required>
-      </div>
-      
-      <button type="submit">Se connecter</button>
-    </form>
+    </div>
   </div>
+  <script src="/metronic/js/ktui.min.js"></script>
 </body>
 </html>

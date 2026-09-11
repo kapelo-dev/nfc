@@ -1,0 +1,147 @@
+<%
+  const nameAttr = previewName ? 'data-preview-name' : '';
+  const nameText = previewName ? 'Votre nom' : (displayName || 'Votre nom');
+  const titleAttr = previewTitle ? 'data-preview-title' : '';
+  const titleText = previewTitle ? 'Titre du poste' : (displayTitle || 'Titre du poste');
+  const nfcChip = '<svg width="16" height="12" viewBox="0 0 26 18" fill="none"><rect x="0.5" y="0.5" width="25" height="17" rx="3" stroke="' + s.chip + '"/><circle cx="13" cy="9" r="3" stroke="' + s.chip + '"/></svg>';
+  const nameFont = "'Alex Brush', cursive";
+%>
+<div class="card-flip relative rounded-xl ring-2 ring-transparent peer-checked:ring-primary transition-all" style="aspect-ratio: 1.586 / 1; perspective: 800px;" data-card-flip>
+  <div class="card-flip-inner relative w-full h-full transition-transform duration-500" style="transform-style: preserve-3d;" data-card-inner>
+    <div class="absolute inset-0 rounded-xl overflow-hidden shadow-md" style="backface-visibility: hidden; background: <%= s.bg %>; color: <%= s.fg %>;">
+      <% if (s.id === 'mat-noir-or') { %>
+        <div class="h-full flex flex-col justify-between pl-3 pr-7 pt-3 pb-3">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+              <div class="text-[9px] mt-0.5" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <%- nfcChip %>
+            </div>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'blanc-minimal') { %>
+        <div class="h-full flex flex-col items-center justify-center gap-2 px-3 text-center">
+          <div class="text-[22px] leading-none" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          <div class="flex items-center gap-1.5">
+            <%- nfcChip %>
+            <span class="text-[8px]" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></span>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'couleur-reseau') { %>
+        <div class="h-full flex flex-col items-center justify-center gap-1.5 px-3 text-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><path d="M6.5 17.5 4 20l2.6-2.4A7.9 7.9 0 1 1 9.5 19l-3 .8"/><path d="M9 10c0 3 2 5 5 5"/></svg>
+          <div class="text-[17px]" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          <div class="text-[7px] opacity-90">Contactez-moi en un tap</div>
+        </div>
+
+      <% } else if (s.id === 'pop-createur') { %>
+        <svg class="absolute inset-0" width="100%" height="100%" viewBox="0 0 160 100" preserveAspectRatio="none" style="opacity:.9;">
+          <circle cx="144" cy="16" r="2.2" fill="#22d3ee"/>
+          <circle cx="130" cy="28" r="1.3" fill="#f472b6"/>
+          <circle cx="16" cy="82" r="1.6" fill="#22d3ee"/>
+        </svg>
+        <div class="relative h-full flex flex-col items-center justify-center gap-1.5 px-3 text-center">
+          <div class="size-7 rounded-full flex items-center justify-center" style="background: rgba(255,255,255,0.18);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#ffd166"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8Z"/></svg>
+          </div>
+          <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          <div class="text-[6px] tracking-widest uppercase px-2 py-0.5 rounded-full" style="background: rgba(255,255,255,0.16); color: <%= s.sub %>;">Tapez pour connecter</div>
+        </div>
+
+      <% } else if (s.id === 'geometrique-sombre') { %>
+        <svg class="absolute inset-0" width="100%" height="100%" viewBox="0 0 160 100" preserveAspectRatio="none" style="opacity:.65;">
+          <path d="M-10 55 L60 55 L100 15" stroke="<%= s.sub %>" stroke-width="1" fill="none"/>
+          <path d="M-10 75 L80 75 L130 25" stroke="<%= s.sub %>" stroke-width="1" fill="none"/>
+        </svg>
+        <div class="relative h-full flex flex-col justify-between pl-3 pr-7 pt-3 pb-2.5">
+          <div></div>
+          <div class="flex items-end justify-between">
+            <span class="text-[7px]" style="color: <%= s.sub %>;">Tap to share</span>
+            <div class="text-right">
+              <div class="text-[17px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+              <div class="flex items-center justify-end gap-1 mt-0.5">
+                <%- nfcChip %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'dore-elegant') { %>
+        <svg class="absolute bottom-0 right-0" width="70%" height="60" viewBox="0 0 120 60" preserveAspectRatio="none"><path d="M120 60 L120 10 Q80 0 50 25 Q30 42 0 40 L0 60 Z" fill="<%= s.wave %>" opacity="0.6"/></svg>
+        <div class="absolute top-2.5 left-2.5 size-3.5 rounded-full border" style="border-color: <%= s.sub %>;"></div>
+        <div class="absolute top-2 right-2"><%- nfcChip %></div>
+        <div class="relative h-full flex flex-col items-center justify-center text-center px-4">
+          <div class="text-[19px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          <div class="text-[8px] mt-0.5 uppercase tracking-wide" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+        </div>
+
+      <% } else if (s.id === 'eco-nature') { %>
+        <div class="h-full flex flex-col justify-between pl-3 pr-7 pt-3 pb-3">
+          <div class="flex items-center justify-between">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="<%= s.chip %>" stroke-width="1.5"><path d="M12 21c-4-2-7-6-7-11a7 7 0 0 1 14 0c0 5-3 9-7 11Z"/><path d="M12 21V10"/></svg>
+            <%- nfcChip %>
+          </div>
+          <div>
+            <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+            <div class="text-[9px] mt-0.5" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+            <div class="text-[7px] mt-1 opacity-80"><%= s.caption %></div>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'metal-brosse') { %>
+        <div class="absolute inset-0" style="background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 3px);"></div>
+        <div class="relative h-full flex flex-col justify-between pl-3 pr-7 pt-3 pb-3">
+          <div class="flex items-center justify-end">
+            <%- nfcChip %>
+          </div>
+          <div>
+            <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+            <div class="text-[7px] mt-0.5 uppercase tracking-widest" style="color: <%= s.sub %>;"><%= s.caption %></div>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'perle-nacre') { %>
+        <div class="absolute top-2 right-2">
+          <%- nfcChip %>
+        </div>
+        <div class="h-full grid grid-cols-2 items-center px-2.5" style="grid-template-columns: 1fr 1fr;">
+          <div class="flex flex-col items-center justify-center text-center border-r pr-2" style="border-color: <%= s.sub %>44;">
+            <div class="size-7 rounded-full border flex items-center justify-center text-[8px] mb-1" style="border-color: <%= s.sub %>;">VN</div>
+            <div class="text-[14px]" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          </div>
+          <div class="flex flex-col items-center justify-center pl-2">
+            <div class="size-9 rounded-lg flex items-center justify-center overflow-hidden p-1" style="background: linear-gradient(145deg, #ffffff 0%, #f5f2ea 55%, #ebe6dc 100%); border: 1px solid <%= s.sub %>44; box-shadow: 0 1px 4px rgba(74,69,60,0.1), inset 0 1px 0 rgba(255,255,255,0.9);">
+              <img src="/images/logo-placeholder.svg" alt="Logo entreprise" class="w-full h-full object-contain">
+            </div>
+            <span class="text-[6px] mt-1 uppercase tracking-[0.18em] font-medium" style="color: <%= s.sub %>;">Logo</span>
+          </div>
+        </div>
+
+      <% } else if (s.id === 'bicolore-pro') { %>
+        <div class="absolute top-0 bottom-0 right-0 w-2" style="background: <%= s.stripe %>;"></div>
+        <div class="h-full flex flex-col justify-center gap-1.5 pl-3 pr-7">
+          <div class="flex items-center gap-1.5">
+            <%- nfcChip %>
+          </div>
+          <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
+          <div class="w-6 h-px" style="background: <%= s.sub %>;"></div>
+          <div class="text-[9px]" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+        </div>
+
+      <% } %>
+    </div>
+    <div class="absolute inset-0 rounded-xl flex flex-col items-center justify-center gap-1 p-2" style="backface-visibility: hidden; transform: rotateY(180deg); background: <%= s.bg %>;">
+      <div class="bg-white rounded-md p-1">
+        <img src="<%= qrSrc %>" alt="QR code <%= s.name %>" style="width: 54px; height: 54px; display: block;">
+      </div>
+      <span class="text-[8px] font-medium text-center leading-tight" style="color: <%= s.fg %>;"><%- qrCaption %></span>
+    </div>
+  </div>
+  <button type="button" class="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/30 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/50 transition-colors" data-flip-trigger aria-label="Voir le verso">
+    <i class="ki-filled ki-arrows-circle text-[11px]"></i>
+  </button>
+</div>

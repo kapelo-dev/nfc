@@ -1,29 +1,16 @@
 const categories = [
   { id: 'pro', label: 'Professionnel' },
   { id: 'dark', label: 'Fond sombre' },
-  { id: 'pink', label: 'Rose' },
-  { id: 'influencer', label: 'Influenceur' }
+  { id: 'pink', label: 'Rose' }
 ];
 
 const templates = [
   { id: 'default', name: 'Classique', category: 'pro', preview: { bg: '#dbeafe', card: '#42a5f5', text: '#fff' } },
-  { id: 'executive', name: 'Executive', category: 'pro', preview: { bg: '#0f172a', card: '#1e3a5f', text: '#c9a227' } },
-  { id: 'minimal', name: 'Minimal', category: 'pro', preview: { bg: '#fafafa', card: '#ffffff', text: '#111' } },
-  { id: 'luxe', name: 'Luxe', category: 'pro', preview: { bg: '#f5f0e8', card: '#c9a227', text: '#1a1a1a' } },
-  { id: 'midnight', name: 'Minuit', category: 'dark', preview: { bg: '#0a0a0a', card: '#1a1a1a', text: '#fff' } },
-  { id: 'neon', name: 'Néon', category: 'dark', preview: { bg: '#050510', card: '#00f0ff', text: '#ff00ea' } },
-  { id: 'obsidian', name: 'Obsidienne', category: 'dark', preview: { bg: '#12100e', card: '#c9a227', text: '#fff' } },
-  { id: 'noir', name: 'Noir cinéma', category: 'dark', preview: { bg: '#111111', card: '#222', text: '#e8e8e8' } },
-  { id: 'blush', name: 'Blush', category: 'pink', preview: { bg: '#fce7f3', card: '#f9a8d4', text: '#831843' } },
-  { id: 'rose', name: 'Rose bold', category: 'pink', preview: { bg: '#db2777', card: '#f472b6', text: '#fff' } },
-  { id: 'sakura', name: 'Sakura', category: 'pink', preview: { bg: '#fff1f2', card: '#fda4af', text: '#9f1239' } },
-  { id: 'barbie', name: 'Barbie', category: 'pink', preview: { bg: '#ec4899', card: '#fbcfe8', text: '#500724' } },
-  { id: 'creator', name: 'Creator', category: 'influencer', preview: { bg: '#18181b', card: '#27272a', text: '#fff' } },
-  { id: 'glass', name: 'Glass', category: 'influencer', preview: { bg: '#667eea', card: 'rgba(255,255,255,0.3)', text: '#fff' } },
-  { id: 'aurora', name: 'Aurora', category: 'influencer', preview: { bg: '#c084fc', card: '#67e8f9', text: '#fff' } },
-  { id: 'editorial', name: 'Editorial', category: 'influencer', preview: { bg: '#fff', card: '#111', text: '#111' } },
-  { id: 'y2k', name: 'Y2K', category: 'influencer', preview: { bg: '#f0abfc', card: '#22d3ee', text: '#831843' } },
-  { id: 'sunset', name: 'Sunset', category: 'influencer', preview: { bg: '#fb923c', card: '#f472b6', text: '#fff' } }
+  { id: 'douceur', name: 'Douceur', category: 'pro', preview: { bg: '#faf8f4', card: '#8a9a7e', text: '#3a362f' } },
+  { id: 'carte', name: 'Carte premium', category: 'pro', preview: { bg: '#eef0f2', card: '#23262b', text: '#1b1d21' } },
+  { id: 'prestige', name: 'Prestige', category: 'dark', preview: { bg: '#0f0c09', card: '#c9a24d', text: '#f2ece1' } },
+  { id: 'neon', name: 'Néon', category: 'dark', preview: { bg: '#050510', card: '#00f0ff', text: '#ff2fd0' } },
+  { id: 'barbie', name: 'Barbie', category: 'pink', preview: { bg: '#ffd1e8', card: '#ff2f92', text: '#fff' } }
 ];
 
 const { sanitizeThemeColor, sanitizeCardInput } = require('../lib/sanitize');

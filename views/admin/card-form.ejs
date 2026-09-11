@@ -1,407 +1,224 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= card ? 'Modifier' : 'Nouvelle' %> carte - NFC Card Manager</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f5f5;
-    }
-    .header {
-      background: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
-      color: white;
-      padding: 20px 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    .header h1 {
-      font-size: 24px;
-    }
-    .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .btn-secondary {
-      background: rgba(255,255,255,0.2);
-      color: white;
-    }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.3);
-    }
-    .container {
-      max-width: 1180px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 24px;
-      align-items: start;
-    }
-    .preview-pane {
-      position: sticky;
-      top: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      padding: 20px 16px;
-    }
-    .preview-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .preview-head h3 {
-      color: #333;
-      font-size: 15px;
-    }
-    .preview-head a {
-      font-size: 12px;
-      color: #42a5f5;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .preview-head a:hover { text-decoration: underline; }
-    .phone {
-      width: 270px;
-      height: 540px;
-      margin: 0 auto;
-      border: 10px solid #1a1a1a;
-      border-radius: 32px;
-      overflow: hidden;
-      background: #111;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-    }
-    .phone iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      background: #fff;
-    }
-    @media (max-width: 960px) {
-      .layout { grid-template-columns: 1fr; }
-      .preview-pane { position: static; }
-    }
-    .form-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      padding: 40px;
-    }
-    .form-card h2 {
-      color: #333;
-      margin-bottom: 30px;
-    }
-    .error {
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid #c33;
-    }
-    .form-section {
-      margin-bottom: 30px;
-    }
-    .form-section h3 {
-      color: #42a5f5;
-      font-size: 16px;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f0f0f0;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 500;
-      font-size: 14px;
-    }
-    label i {
-      margin-right: 8px;
-      width: 20px;
-      text-align: center;
-    }
-    .fa-snapchat { color: #FFFC00; }
-    .fa-tiktok { color: #000000; }
-    .fa-whatsapp { color: #25D366; }
-    .fa-linkedin { color: #0077B5; }
-    .fa-instagram { color: #E4405F; }
-    .fa-facebook { color: #1877F2; }
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color 0.3s;
-    }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #42a5f5;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .checkbox-group input[type="checkbox"] {
-      width: auto;
-    }
-    .form-actions {
-      display: flex;
-      gap: 15px;
-      margin-top: 30px;
-      padding-top: 30px;
-      border-top: 2px solid #f0f0f0;
-    }
-    .btn-primary {
-      background: #42a5f5;
-      color: white;
-      flex: 1;
-    }
-    .btn-primary:hover {
-      background: #1e88e5;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-    .btn-cancel {
-      background: #e0e0e0;
-      color: #666;
-      flex: 1;
-    }
-    .btn-cancel:hover {
-      background: #d0d0d0;
-    }
-    .help-text {
-      font-size: 12px;
-      color: #999;
-      margin-top: 5px;
-    }
-    .tpl-cat { margin-bottom: 22px; }
-    .tpl-cat h4 {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-    .tpl-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-    }
-    .tpl-option { cursor: pointer; display: block; position: relative; }
-    .tpl-option input { position: absolute; opacity: 0; pointer-events: none; }
-    .tpl-preview {
-      height: 92px;
-      border-radius: 12px;
-      border: 2px solid #e8e8e8;
-      padding: 12px 10px 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: 0.2s;
-    }
-    .tpl-option input:checked + .tpl-preview {
-      border-color: #42a5f5;
-      box-shadow: 0 0 0 3px rgba(66,165,245,0.25);
-    }
-    .tpl-option:hover .tpl-preview { border-color: #90caf9; }
-    .tpl-mini-avatar {
-      width: 22px; height: 22px; border-radius: 50%;
-      background: currentColor; opacity: 0.85;
-    }
-    .tpl-mini-line {
-      height: 4px; width: 56px; border-radius: 4px;
-      background: currentColor; opacity: 0.7;
-    }
-    .tpl-mini-line.short { width: 36px; opacity: 0.4; }
-    .tpl-name {
-      display: block;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 600;
-      color: #444;
-      margin-top: 6px;
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>🎴 <%= card ? 'Modifier' : 'Nouvelle' %> carte</h1>
-    <a href="/admin/dashboard" class="btn btn-secondary">← Retour</a>
+<%- include('partials/shell-open', { title: (card ? 'Modifier' : 'Nouvelle') + ' carte', active: 'cards', extraHead: '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap">' }) %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1"><%= card ? 'Modifier la carte' : 'Créer une nouvelle carte' %></h1>
+    <p class="text-sm text-secondary-foreground">Renseignez les informations qui apparaîtront sur le profil public</p>
   </div>
+  <a class="kt-btn kt-btn-outline" href="/admin/dashboard">
+    <i class="ki-filled ki-left"></i>
+    Retour
+  </a>
+</div>
 
-  <div class="container layout">
-    <div class="form-card">
-      <h2><%= card ? 'Modifier la carte' : 'Créer une nouvelle carte' %></h2>
-      
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 items-start">
+  <div class="kt-card">
+    <div class="kt-card-content p-6 lg:p-8">
       <% if (error) { %>
-        <div class="error"><%= error %></div>
+        <div class="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/5 text-destructive text-sm px-3 py-2.5 mb-6">
+          <i class="ki-filled ki-information-2 text-base shrink-0"></i>
+          <span><%= error %></span>
+        </div>
       <% } %>
-      
-      <form method="POST" action="<%= card ? `/admin/cards/${card.id}` : '/admin/cards' %>">
+
+      <form method="POST" action="<%= card ? `/admin/cards/${card.id}` : '/admin/cards' %>" id="card_form" enctype="multipart/form-data" class="flex flex-col gap-8">
         <%- include('partials/csrf') %>
-        <div class="form-section">
-          <h3>📋 Informations générales</h3>
-          
-          <div class="form-group">
-            <label for="name">Nom complet *</label>
-            <input type="text" id="name" name="name" value="<%= card ? card.name : '' %>" required>
-          </div>
-          
-          <% if (card && card.card_id) { %>
-          <div class="form-group">
-            <label>Lien de la carte</label>
-            <input type="text" value="/c/<%= card.card_id %>" readonly style="background: #f5f5f5; cursor: not-allowed;">
-            <div class="help-text">Ce lien est généré automatiquement et ne peut pas être modifié</div>
-          </div>
-          <% } %>
-          
-          <div class="form-group">
-            <label for="title">Titre / Profession</label>
-            <input type="text" id="title" name="title" value="<%= card ? card.title : '' %>" placeholder="Ex: Développeur Web">
-          </div>
-          
-          <div class="form-group">
-            <label for="bio">Biographie</label>
-            <textarea id="bio" name="bio" placeholder="Quelques mots sur vous..."><%= card ? card.bio : '' %></textarea>
-          </div>
-          
-          <div class="form-group">
-            <label for="photo_url">URL de la photo de profil</label>
-            <input type="url" id="photo_url" name="photo_url" value="<%= card ? card.photo_url : '' %>" placeholder="https://exemple.com/photo.jpg">
-          </div>
-          
-          <div class="form-group">
-            <label for="theme_color">🎨 Couleur du thème</label>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <input type="color" id="theme_color" name="theme_color" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>" style="width: 60px; height: 40px; cursor: pointer;">
-              <input type="text" id="theme_color_text" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>" readonly style="flex: 1; background: #f5f5f5;">
-            </div>
-            <div class="help-text">Utilisée comme accent sur certains templates (Classique, Minuit…)</div>
-          </div>
-        </div>
 
-        <div class="form-section">
-          <h3>🖼 Template de la carte</h3>
-          <% const selectedTpl = card && card.template ? card.template : 'default'; %>
-          <% categories.forEach(function(cat) { %>
-            <div class="tpl-cat">
-              <h4><%= cat.label %></h4>
-              <div class="tpl-grid">
-                <% templates.filter(function(t) { return t.category === cat.id; }).forEach(function(t) { %>
-                  <label class="tpl-option">
-                    <input type="radio" name="template" value="<%= t.id %>" <%= selectedTpl === t.id ? 'checked' : '' %>>
-                    <div class="tpl-preview" style="background: <%= t.preview.bg %>; color: <%= t.preview.text %>;">
-                      <div class="tpl-mini-avatar" style="background: <%= t.preview.card %>;"></div>
-                      <div class="tpl-mini-line"></div>
-                      <div class="tpl-mini-line short"></div>
-                    </div>
-                    <span class="tpl-name"><%= t.name %></span>
-                  </label>
-                <% }); %>
-              </div>
+        <% if (card && card.is_request) { %>
+          <div class="rounded-lg border border-warning/30 bg-warning/5 p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="kt-badge kt-badge-sm kt-badge-warning kt-badge-outline">Demande en attente</span>
+              <span class="text-xs text-secondary-foreground">Cette carte vient du formulaire public de commande</span>
             </div>
-          <% }); %>
-        </div>
-        
-        <div class="form-section">
-          <h3>🔗 Réseaux sociaux</h3>
-          
-          <div class="form-group">
-            <label for="snapchat"><i class="fab fa-snapchat"></i>Snapchat</label>
-            <input type="text" id="snapchat" name="snapchat" value="<%= card ? card.snapchat : '' %>" placeholder="Nom d'utilisateur ou lien">
-          </div>
-          
-          <div class="form-group">
-            <label for="tiktok"><i class="fab fa-tiktok"></i>TikTok</label>
-            <input type="text" id="tiktok" name="tiktok" value="<%= card ? card.tiktok : '' %>" placeholder="@username ou lien">
-          </div>
-          
-          <div class="form-group">
-            <label for="whatsapp"><i class="fab fa-whatsapp"></i>WhatsApp</label>
-            <input type="text" id="whatsapp" name="whatsapp" value="<%= card ? card.whatsapp : '' %>" placeholder="Numéro de téléphone ou lien">
-          </div>
-          
-          <div class="form-group">
-            <label for="linkedin"><i class="fab fa-linkedin"></i>LinkedIn</label>
-            <input type="text" id="linkedin" name="linkedin" value="<%= card ? card.linkedin : '' %>" placeholder="URL du profil">
-          </div>
-          
-          <div class="form-group">
-            <label for="instagram"><i class="fab fa-instagram"></i>Instagram</label>
-            <input type="text" id="instagram" name="instagram" value="<%= card ? card.instagram : '' %>" placeholder="@username ou lien">
-          </div>
-          
-          <div class="form-group">
-            <label for="facebook"><i class="fab fa-facebook"></i>Facebook</label>
-            <input type="text" id="facebook" name="facebook" value="<%= card ? card.facebook : '' %>" placeholder="URL du profil">
-          </div>
-        </div>
-
-        <% if (card) { %>
-          <div class="form-section">
-            <h3>⚙️ Paramètres</h3>
-            
-            <div class="form-group">
-              <div class="checkbox-group">
-                <input type="checkbox" id="is_active" name="is_active" value="1" <%= card && card.is_active ? 'checked' : '' %>>
-                <label for="is_active" style="margin: 0;">Carte active</label>
-              </div>
-              <div class="help-text">Les cartes inactives ne sont pas accessibles publiquement</div>
+            <div class="flex flex-wrap gap-x-5 gap-y-1 text-sm text-mono">
+              <% if (card.contact_email) { %><span><i class="ki-filled ki-sms text-muted-foreground"></i> <%= card.contact_email %></span><% } %>
+              <% if (card.contact_phone) { %><span><i class="ki-filled ki-phone text-muted-foreground"></i> <%= card.contact_phone %></span><% } %>
             </div>
           </div>
         <% } %>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">
+        <div>
+          <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+            Informations générales
+          </h3>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono" for="name">Nom complet *</label>
+              <input class="kt-input" id="name" name="name" type="text" value="<%= card ? card.name : '' %>" required>
+            </div>
+
+            <% if (card && card.card_id) { %>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono">Lien de la carte</label>
+                <input class="kt-input bg-muted text-muted-foreground cursor-not-allowed" type="text" value="/c/<%= card.card_id %>" readonly>
+                <span class="text-xs text-secondary-foreground">Ce lien est généré automatiquement et ne peut pas être modifié</span>
+              </div>
+            <% } %>
+
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono" for="title">Titre / Profession</label>
+              <input class="kt-input" id="title" name="title" type="text" value="<%= card ? card.title : '' %>" placeholder="Ex: Développeur Web">
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono" for="bio">Biographie</label>
+              <textarea class="kt-textarea min-h-[100px]" id="bio" name="bio" placeholder="Quelques mots sur vous..."><%= card ? card.bio : '' %></textarea>
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono" for="photo">Photo de profil</label>
+              <% if (card && card.photo_url) { %>
+                <div class="flex items-center gap-3 mb-1.5">
+                  <img src="<%= card.photo_url %>" alt="Photo actuelle" class="size-14 rounded-full object-cover border border-border">
+                  <span class="text-xs text-secondary-foreground">Photo actuelle — choisissez un fichier pour la remplacer</span>
+                </div>
+              <% } %>
+              <input class="kt-input" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
+              <input type="hidden" name="existing_photo_url" value="<%= card ? card.photo_url : '' %>">
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono" for="theme_color">Couleur du thème</label>
+              <div class="flex items-center gap-2.5">
+                <input class="h-10 w-14 rounded-md border border-input cursor-pointer shrink-0" id="theme_color" name="theme_color" type="color" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>">
+                <input class="kt-input bg-muted text-muted-foreground" id="theme_color_text" type="text" value="<%= card && card.theme_color ? card.theme_color : '#42a5f5' %>" readonly>
+              </div>
+              <span class="text-xs text-secondary-foreground">Utilisée comme accent sur certains templates (Classique, Minuit…)</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+            Template de la carte
+          </h3>
+          <% const selectedTpl = card && card.template ? card.template : 'default'; %>
+          <div class="flex flex-col gap-5">
+            <% categories.forEach(function(cat) { %>
+              <div>
+                <h4 class="text-xs font-semibold text-secondary-foreground uppercase tracking-wide mb-2.5"><%= cat.label %></h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <% templates.filter(function(t) { return t.category === cat.id; }).forEach(function(t) { %>
+                    <label class="flex flex-col cursor-pointer">
+                      <input class="peer sr-only" type="radio" name="template" value="<%= t.id %>" <%= selectedTpl === t.id ? 'checked' : '' %>>
+                      <div class="flex flex-col items-center justify-center gap-1.5 h-[86px] rounded-lg border-2 border-border px-2.5 py-2 transition-all peer-checked:border-primary peer-checked:ring-2 peer-checked:ring-primary/20 hover:border-primary/50" style="background: <%= t.preview.bg %>; color: <%= t.preview.text %>;">
+                        <div class="size-5 rounded-full opacity-85" style="background: <%= t.preview.card %>;"></div>
+                        <div class="h-1 w-12 rounded-full opacity-70" style="background: currentColor;"></div>
+                        <div class="h-1 w-8 rounded-full opacity-40" style="background: currentColor;"></div>
+                      </div>
+                      <span class="block text-center text-xs font-medium text-mono mt-1.5"><%= t.name %></span>
+                    </label>
+                  <% }); %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+            Design physique de la carte
+          </h3>
+          <p class="text-xs text-secondary-foreground mb-4">Détermine quel fichier Canva utiliser pour la fabrication. Retournez une carte pour voir son verso.</p>
+          <% const selectedPhysical = card && card.physical_style ? card.physical_style : physicalStyles[0].id; %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <% physicalStyles.forEach(function(s) { %>
+              <label class="flex flex-col cursor-pointer">
+                <input class="peer sr-only" type="radio" name="physical_style" value="<%= s.id %>" data-physical-option <%= selectedPhysical === s.id ? 'checked' : '' %>>
+                <%- include('../partials/physical-card', { s, qrSrc: physicalQrCodes[s.id], qrCaption: 'Scanner pour<br>commander', previewName: true, previewTitle: true, displayName: '', displayTitle: '' }) %>
+                <span class="block text-center text-xs font-medium text-mono mt-1.5"><%= s.name %></span>
+              </label>
+            <% }); %>
+            <label class="flex flex-col cursor-pointer">
+              <input class="peer sr-only" type="radio" name="physical_style" value="custom" data-physical-option data-custom-design-radio <%= selectedPhysical === 'custom' ? 'checked' : '' %>>
+              <%- include('../partials/custom-design-card', { imageSrc: card && card.custom_design_url ? card.custom_design_url : '', qrSrc: physicalQrCodes['custom'], qrCaption: 'Scanner pour<br>commander' }) %>
+              <span class="block text-center text-xs font-medium text-mono mt-1.5">Design personnalisé</span>
+            </label>
+          </div>
+
+          <div class="mt-4 <%= selectedPhysical === 'custom' ? 'flex' : 'hidden' %> flex-col gap-1" data-custom-design-upload>
+            <label class="kt-form-label font-normal text-mono" for="custom_design_photo">Votre visuel (recto de la carte)</label>
+            <input class="kt-input" id="custom_design_photo" name="custom_design_photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" data-custom-design-input>
+            <input type="hidden" name="existing_custom_design_url" value="<%= card && card.custom_design_url ? card.custom_design_url : '' %>">
+            <span class="text-xs text-secondary-foreground">Format recommandé proche d'une carte de crédit (largeur ≈ 1,6× la hauteur), haute résolution.</span>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+            Réseaux sociaux
+          </h3>
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="snapchat"><i class="fab fa-snapchat text-[#FFFC00]"></i>Snapchat</label>
+              <input class="kt-input" id="snapchat" name="snapchat" type="text" value="<%= card ? card.snapchat : '' %>" placeholder="Nom d'utilisateur ou lien">
+              <% if (card && card.snapchat_photo) { %><a href="<%= card.snapchat_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="tiktok"><i class="fab fa-tiktok"></i>TikTok</label>
+              <input class="kt-input" id="tiktok" name="tiktok" type="text" value="<%= card ? card.tiktok : '' %>" placeholder="@username ou lien">
+              <% if (card && card.tiktok_photo) { %><a href="<%= card.tiktok_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="whatsapp"><i class="fab fa-whatsapp text-[#25D366]"></i>WhatsApp</label>
+              <input class="kt-input" id="whatsapp" name="whatsapp" type="text" value="<%= card ? card.whatsapp : '' %>" placeholder="Numéro de téléphone ou lien">
+              <% if (card && card.whatsapp_photo) { %><a href="<%= card.whatsapp_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="linkedin"><i class="fab fa-linkedin text-[#0077B5]"></i>LinkedIn</label>
+              <input class="kt-input" id="linkedin" name="linkedin" type="text" value="<%= card ? card.linkedin : '' %>" placeholder="URL du profil">
+              <% if (card && card.linkedin_photo) { %><a href="<%= card.linkedin_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="instagram"><i class="fab fa-instagram text-[#E4405F]"></i>Instagram</label>
+              <input class="kt-input" id="instagram" name="instagram" type="text" value="<%= card ? card.instagram : '' %>" placeholder="@username ou lien">
+              <% if (card && card.instagram_photo) { %><a href="<%= card.instagram_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="kt-form-label font-normal text-mono flex items-center gap-1.5" for="facebook"><i class="fab fa-facebook text-[#1877F2]"></i>Facebook</label>
+              <input class="kt-input" id="facebook" name="facebook" type="text" value="<%= card ? card.facebook : '' %>" placeholder="URL du profil">
+              <% if (card && card.facebook_photo) { %><a href="<%= card.facebook_photo %>" target="_blank" rel="noopener" class="kt-link text-xs w-fit">Voir la photo du compte fournie</a><% } %>
+            </div>
+          </div>
+        </div>
+
+        <% if (card) { %>
+          <div>
+            <h3 class="text-sm font-semibold text-mono uppercase tracking-wide mb-4 pb-2.5 border-b border-border">
+              Paramètres
+            </h3>
+            <label class="kt-label">
+              <input class="kt-checkbox" id="is_active" name="is_active" type="checkbox" value="1" <%= card && card.is_active ? 'checked' : '' %>>
+              Carte active
+            </label>
+            <p class="text-xs text-secondary-foreground mt-1.5">Les cartes inactives ne sont pas accessibles publiquement</p>
+          </div>
+        <% } %>
+
+        <div class="flex items-center gap-3 pt-6 border-t border-border">
+          <button class="kt-btn kt-btn-primary grow justify-center" type="submit">
             <%= card ? 'Mettre à jour' : 'Créer la carte' %>
           </button>
-          <a href="/admin/dashboard" class="btn btn-cancel">Annuler</a>
+          <a class="kt-btn kt-btn-outline grow justify-center" href="/admin/dashboard">Annuler</a>
         </div>
       </form>
     </div>
-
-    <aside class="preview-pane">
-      <div class="preview-head">
-        <h3>Aperçu en direct</h3>
-        <a href="/admin/preview" id="preview-open" target="_blank" rel="noopener">Plein écran</a>
-      </div>
-      <div class="phone">
-        <iframe id="tpl-preview-frame" title="Aperçu du template"></iframe>
-      </div>
-      <p class="help-text" style="text-align: center; margin-top: 12px;">Cliquez un template pour le voir. L’aperçu suit aussi vos infos.</p>
-    </aside>
   </div>
-  <script src="/js/admin-form.js"></script>
-</body>
-</html>
+
+  <aside class="kt-card lg:sticky lg:top-[86px]">
+    <div class="kt-card-content p-5">
+      <div class="flex items-center justify-between mb-3.5">
+        <h3 class="text-sm font-semibold text-mono">Aperçu en direct</h3>
+        <a class="kt-link text-xs" href="/admin/preview" id="preview-open" target="_blank" rel="noopener">Plein écran</a>
+      </div>
+      <div class="w-[240px] h-[480px] mx-auto rounded-[28px] border-[8px] border-mono overflow-hidden bg-mono shadow-lg">
+        <iframe class="w-full h-full border-0 bg-background" id="tpl-preview-frame" title="Aperçu du template"></iframe>
+      </div>
+      <p class="text-xs text-secondary-foreground text-center mt-3">Cliquez un template pour le voir. L'aperçu suit aussi vos infos.</p>
+    </div>
+  </aside>
+</div>
+<script src="/js/admin-form.js"></script>
+
+<%- include('partials/shell-close') %>
