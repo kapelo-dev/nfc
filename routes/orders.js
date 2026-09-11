@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID: uuidv4 } = require('crypto');
 const rateLimit = require('express-rate-limit');
 const db = require('../config/database');
 const { uploadBuffer, uploadDesignBuffer } = require('../config/cloudinary');
