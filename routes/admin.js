@@ -37,7 +37,8 @@ async function formLocals(card, error) {
 
 const uploadCardFields = upload.fields([
   { name: 'photo', maxCount: 1 },
-  { name: 'custom_design_photo', maxCount: 1 }
+  { name: 'custom_design_photo', maxCount: 1 },
+  { name: 'custom_design_back_photo', maxCount: 1 }
 ]);
 
 function handlePhotoUpload(req, res, next) {
@@ -225,12 +226,18 @@ router.post('/cards', isAuthenticated, handlePhotoUpload, verifyCsrf, async (req
       customDesignUrl = result.secure_url;
     }
 
+    let customDesignBackUrl = sanitizeHttpsUrl(req.body.existing_custom_design_back_url, 500) || '';
+    if (resolvePhysicalStyle(fields.physical_style) === 'custom' && req.files && req.files.custom_design_back_photo && req.files.custom_design_back_photo[0]) {
+      const result = await uploadDesignBuffer(req.files.custom_design_back_photo[0].buffer);
+      customDesignBackUrl = result.secure_url;
+    }
+
     const cardId = uuidv4().replace(/-/g, '');
 
     await db.query(
-      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, snapchat, tiktok, whatsapp, linkedin, instagram, facebook)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook]
+      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, snapchat, tiktok, whatsapp, linkedin, instagram, facebook)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook]
     );
 
     res.redirect('/admin/dashboard');
@@ -281,9 +288,15 @@ router.post('/cards/:id', isAuthenticated, handlePhotoUpload, verifyCsrf, async 
       customDesignUrl = result.secure_url;
     }
 
+    let customDesignBackUrl = sanitizeHttpsUrl(req.body.existing_custom_design_back_url, 500) || '';
+    if (resolvePhysicalStyle(fields.physical_style) === 'custom' && req.files && req.files.custom_design_back_photo && req.files.custom_design_back_photo[0]) {
+      const result = await uploadDesignBuffer(req.files.custom_design_back_photo[0].buffer);
+      customDesignBackUrl = result.secure_url;
+    }
+
     await db.query(
-      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, template = ?, physical_style = ?, custom_design_url = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ?, is_request = 0 WHERE id = ?`,
-      [fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook, fields.is_active ? 1 : 0, req.params.id]
+      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, template = ?, physical_style = ?, custom_design_url = ?, custom_design_back_url = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ?, is_request = 0 WHERE id = ?`,
+      [fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook, fields.is_active ? 1 : 0, req.params.id]
     );
 
     res.redirect('/admin/dashboard');

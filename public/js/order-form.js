@@ -84,6 +84,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  const customDesignBackInput = document.querySelector('[data-custom-design-back-input]');
+  if (customDesignBackInput && customDesignRadio) {
+    customDesignBackInput.addEventListener('change', function () {
+      const file = customDesignBackInput.files && customDesignBackInput.files[0];
+      if (!file) return;
+      const tile = customDesignRadio.closest('label').querySelector('[data-card-flip]');
+      const img = tile && tile.querySelector('[data-custom-design-back-preview]');
+      if (img) {
+        img.src = URL.createObjectURL(file);
+        img.classList.remove('hidden');
+      }
+    });
+  }
+
   const nameInput = document.getElementById('name');
   const titleInput = document.getElementById('title');
   const previewNameEls = document.querySelectorAll('[data-preview-name]');

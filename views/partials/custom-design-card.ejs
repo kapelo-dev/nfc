@@ -11,11 +11,12 @@
         <img src="" alt="Design personnalisé" class="w-full h-full object-cover hidden" data-custom-design-preview>
       <% } %>
     </div>
-    <div class="absolute inset-0 rounded-xl flex flex-col items-center justify-center gap-1 p-2" style="backface-visibility: hidden; transform: rotateY(180deg); background: #1a1a1a;">
+    <div class="absolute inset-0 rounded-xl overflow-hidden flex flex-col items-center justify-center gap-1 p-2" style="backface-visibility: hidden; transform: rotateY(180deg); background: #1a1a1a;">
+      <img src="<%= backImageSrc || '' %>" alt="Verso personnalisé" class="absolute inset-0 w-full h-full object-cover <%= backImageSrc ? '' : 'hidden' %>" data-custom-design-back-preview>
       <div class="bg-white rounded-md p-1">
         <img src="<%= qrSrc %>" alt="QR code" style="width: 54px; height: 54px; display: block;">
       </div>
-      <span class="text-[8px] font-medium text-center leading-tight text-white"><%- qrCaption %></span>
+      <span class="text-[8px] font-medium text-center leading-tight text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.7);"><%- qrCaption %></span>
     </div>
   </div>
   <button type="button" class="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/30 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/50 transition-colors" data-flip-trigger aria-label="Voir le verso">

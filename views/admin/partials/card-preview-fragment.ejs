@@ -3,6 +3,7 @@
     <% if (card.physical_style === 'custom') { %>
       <%- include('../../partials/custom-design-card', {
         imageSrc: card.custom_design_url || '',
+        backImageSrc: card.custom_design_back_url || '',
         qrSrc: qrSrc,
         qrCaption: 'Scanner pour<br>commander'
       }) %>

@@ -212,15 +212,22 @@
               <% }); %>
               <label class="flex flex-col cursor-pointer">
                 <input class="peer sr-only" type="radio" name="physical_style" value="custom" data-physical-option data-custom-design-radio <%= selectedPhysical === 'custom' ? 'checked' : '' %>>
-                <%- include('../partials/custom-design-card', { imageSrc: '', qrSrc: qrCodes['custom'], qrCaption: 'Scanner pour<br>commander' }) %>
+                <%- include('../partials/custom-design-card', { imageSrc: '', backImageSrc: '', qrSrc: qrCodes['custom'], qrCaption: 'Scanner pour<br>commander' }) %>
                 <span class="block text-center text-xs font-medium text-mono mt-1.5">Mon propre design</span>
               </label>
             </div>
 
-            <div class="mt-4 <%= selectedPhysical === 'custom' ? 'flex' : 'hidden' %> flex-col gap-1" data-custom-design-upload>
-              <label class="kt-form-label font-normal text-mono" for="custom_design_photo">Votre visuel (recto de la carte)</label>
-              <input class="kt-input" id="custom_design_photo" name="custom_design_photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" data-custom-design-input>
-              <span class="text-xs text-secondary-foreground">Format recommandé proche d'une carte de crédit (largeur ≈ 1,6× la hauteur), haute résolution.</span>
+            <div class="mt-4 <%= selectedPhysical === 'custom' ? 'flex' : 'hidden' %> flex-col gap-3" data-custom-design-upload>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="custom_design_photo">Votre visuel (recto de la carte)</label>
+                <input class="kt-input" id="custom_design_photo" name="custom_design_photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" data-custom-design-input>
+                <span class="text-xs text-secondary-foreground">Format recommandé proche d'une carte de crédit (largeur ≈ 1,6× la hauteur), haute résolution.</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="kt-form-label font-normal text-mono" for="custom_design_back_photo">Votre visuel (verso de la carte, optionnel)</label>
+                <input class="kt-input" id="custom_design_back_photo" name="custom_design_back_photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" data-custom-design-back-input>
+                <span class="text-xs text-secondary-foreground">Le QR code de commande sera superposé par-dessus. Sans visuel, le verso reste uni avec le QR code.</span>
+              </div>
             </div>
           </div>
 

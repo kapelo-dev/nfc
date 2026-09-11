@@ -17,7 +17,7 @@ const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'ima
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024, files: SOCIAL_NETWORKS.length + 2 },
+  limits: { fileSize: 5 * 1024 * 1024, files: SOCIAL_NETWORKS.length + 3 },
   fileFilter(req, file, cb) {
     cb(null, ALLOWED_MIME_TYPES.has(file.mimetype));
   }
@@ -26,6 +26,7 @@ const upload = multer({
 const uploadFields = upload.fields([
   { name: 'photo', maxCount: 1 },
   { name: 'custom_design_photo', maxCount: 1 },
+  { name: 'custom_design_back_photo', maxCount: 1 },
   ...SOCIAL_NETWORKS.map((n) => ({ name: `${n}_photo`, maxCount: 1 }))
 ]);
 
@@ -139,6 +140,12 @@ router.post('/', orderLimiter, (req, res) => {
           customDesignUrl = result.secure_url;
         }
 
+        let customDesignBackUrl = '';
+        if (resolvePhysicalStyle(fields.physical_style) === 'custom' && files.custom_design_back_photo && files.custom_design_back_photo[0]) {
+          const result = await uploadDesignBuffer(files.custom_design_back_photo[0].buffer);
+          customDesignBackUrl = result.secure_url;
+        }
+
         const socialValues = {};
         const socialPhotos = {};
 
@@ -162,12 +169,12 @@ router.post('/', orderLimiter, (req, res) => {
 
         await db.query(
           `INSERT INTO cards
-            (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, is_active, is_request, contact_phone,
+            (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, is_active, is_request, contact_phone,
              snapchat, tiktok, whatsapp, linkedin, instagram, facebook,
              snapchat_photo, tiktok_photo, whatsapp_photo, linkedin_photo, instagram_photo, facebook_photo)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl,
+            cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl,
             contactPhone,
             socialValues.snapchat, socialValues.tiktok, socialValues.whatsapp, socialValues.linkedin, socialValues.instagram, socialValues.facebook,
             socialPhotos.snapchat, socialPhotos.tiktok, socialPhotos.whatsapp, socialPhotos.linkedin, socialPhotos.instagram, socialPhotos.facebook
