@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<base href="<%= baseHref %>">
+<link rel="stylesheet" href="/metronic/css/styles.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap">
+<style>
+  html, body { margin: 0; padding: 0; background: #fff; }
+  /* Print capture only — the on-screen flip affordance has no place on the physical card. */
+  [data-flip-trigger] { display: none !important; }
+  .render-scale {
+    width: <%= nativeW %>px;
+    transform: scale(<%= scale %>);
+    transform-origin: top left;
+  }
+</style>
+</head>
+<body>
+  <div class="render-scale">
+    <%- include('../partials/physical-card', {
+      s: style,
+      qrSrc: qrSrc,
+      qrCaption: qrCaption,
+      previewName: false,
+      previewTitle: false,
+      displayName: card.name,
+      displayTitle: card.title,
+      photoUrl: card.photo_url || ''
+    }) %>
+  </div>
+</body>
+</html>
