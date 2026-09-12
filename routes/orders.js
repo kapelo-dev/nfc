@@ -65,25 +65,28 @@ router.post('/webhooks/geniuspay', async (req, res) => {
     return res.status(401).json({ error: 'invalid signature' });
   }
 
-  // Acknowledge immediately — GeniusPay expects a fast response, and any failure past this
-  // point shouldn't cause it to keep retrying a webhook we've already validated.
-  res.status(200).json({ received: true });
-
+  // Everything here is awaited before responding — on Vercel, a serverless function can be
+  // frozen the moment its handler promise resolves, which happens almost immediately once a
+  // response is sent, even if other promises (a WhatsApp message, PDF generation, another
+  // WhatsApp call) were started without awaiting them. That silently killed the slower steps
+  // (the physical card PDF in particular) partway through. The payment_status='paid' guard
+  // below makes re-processing a retried delivery safe, so there's no downside to taking the
+  // time to fully finish before acknowledging.
   try {
     const event = req.body && req.body.event;
     const data = (req.body && req.body.data) || {};
     const cardId = parseInt(data.metadata && data.metadata.card_id, 10);
-    if (!Number.isInteger(cardId)) return;
+    if (!Number.isInteger(cardId)) return res.status(200).json({ received: true });
 
     const [cards] = await db.query('SELECT * FROM cards WHERE id = ?', [cardId]);
     const card = cards[0];
-    if (!card) return;
+    if (!card) return res.status(200).json({ received: true });
 
     const reference = data.reference;
     const paymentMethod = data.payment_method || data.provider || null;
 
     if (event === 'payment.success') {
-      if (card.payment_status === 'paid') return;
+      if (card.payment_status === 'paid') return res.status(200).json({ received: true });
       await db.query('UPDATE cards SET payment_status = ? WHERE id = ?', ['paid', cardId]);
       await updateTransactionStatus(reference, 'paid', paymentMethod);
       card.payment_status = 'paid';
@@ -98,16 +101,16 @@ router.post('/webhooks/geniuspay', async (req, res) => {
         await db.query('UPDATE cards SET is_active = 1, is_request = 0 WHERE id = ?', [cardId]);
         card.is_active = 1;
         card.is_request = 0;
-        notifyApprovedCustomer(card);
+        await notifyApprovedCustomer(card);
       } else if (card.contact_phone) {
         // Already an active (e.g. admin-created) card being paid via a manually-sent link.
-        sendWhatsAppMessage(
+        await sendWhatsAppMessage(
           card.contact_phone,
           `Bonjour ${card.name}, nous confirmons la réception de votre paiement pour votre carte NFC. Merci !`
         );
       }
 
-      sendWhatsAppMessage(
+      await sendWhatsAppMessage(
         process.env.GOWA_ADMIN_PHONE,
         `Paiement confirmé\nNom : ${card.name}\nContact WhatsApp : ${card.contact_phone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la carte : https://${baseUrl}/admin/dashboard`
       );
@@ -117,8 +120,11 @@ router.post('/webhooks/geniuspay', async (req, res) => {
         await updateTransactionStatus(reference, 'failed', paymentMethod);
       }
     }
+
+    res.status(200).json({ received: true });
   } catch (error) {
     console.error('GeniusPay webhook processing error:', error);
+    if (!res.headersSent) res.status(200).json({ received: true, error: true });
   }
 });
 

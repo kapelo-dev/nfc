@@ -185,7 +185,9 @@ router.post('/requests/:id/approve', isAuthenticated, verifyCsrf, async (req, re
   try {
     await db.query('UPDATE cards SET is_active = 1, is_request = 0 WHERE id = ?', [req.params.id]);
     const [cards] = await db.query('SELECT * FROM cards WHERE id = ?', [req.params.id]);
-    notifyApprovedCustomer(cards[0]);
+    // Awaited on purpose — on Vercel, redirecting first can freeze the function before this
+    // (WhatsApp message + PDF generation + another WhatsApp call) finishes running.
+    await notifyApprovedCustomer(cards[0]);
     res.redirect('/admin/requests');
   } catch (error) {
     console.error('Approve request error:', error);
@@ -367,25 +369,27 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
       [foundIds]
     );
 
-    cards.forEach((card) => {
-      if (card.contact_phone) {
-        sendWhatsAppMessage(card.contact_phone, fulfillment.messageFor('production', card.name));
-      }
-    });
+    // Awaited on purpose (here and below) — on Vercel, un-awaited work started before the
+    // response is sent risks being frozen mid-flight before it completes.
+    await Promise.all(
+      cards
+        .filter((card) => card.contact_phone)
+        .map((card) => sendWhatsAppMessage(card.contact_phone, fulfillment.messageFor('production', card.name)))
+    );
 
     const pdfBuffer = Buffer.concat(chunks);
     const filename = `planche-impression-${Date.now()}.pdf`;
 
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(pdfBuffer);
-
-    sendWhatsAppDocument(
+    await sendWhatsAppDocument(
       process.env.GOWA_ADMIN_PHONE,
       pdfBuffer,
       filename,
       `Planche d'impression — ${cards.length} carte(s)`
     );
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
   } catch (error) {
     console.error('Print sheet error:', error);
     if (!res.headersSent) res.status(500).send('Erreur lors de la génération du PDF.');
@@ -432,7 +436,7 @@ async function advanceFulfillment(card) {
   await db.query('UPDATE cards SET fulfillment_status = ? WHERE id = ?', [next, card.id]);
   if (card.contact_phone) {
     const message = fulfillment.messageFor(next, card.name);
-    sendWhatsAppMessage(card.contact_phone, message);
+    await sendWhatsAppMessage(card.contact_phone, message);
   }
   return next;
 }
