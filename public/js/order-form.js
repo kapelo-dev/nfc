@@ -121,9 +121,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function syncCardPreviewText() {
     const name = (nameInput && nameInput.value.trim()) || 'Votre nom';
-    const title = (titleInput && titleInput.value.trim()) || 'Titre du poste';
+    const title = titleInput ? titleInput.value.trim() : '';
     previewNameEls.forEach(function (el) { el.textContent = name; });
-    previewTitleEls.forEach(function (el) { el.textContent = title; });
+    previewTitleEls.forEach(function (el) {
+      el.textContent = title;
+      el.classList.toggle('hidden', !title);
+    });
   }
 
   if (nameInput) nameInput.addEventListener('input', syncCardPreviewText);

@@ -2,7 +2,8 @@
   const nameAttr = previewName ? 'data-preview-name' : '';
   const nameText = previewName ? 'Votre nom' : (displayName || 'Votre nom');
   const titleAttr = previewTitle ? 'data-preview-title' : '';
-  const titleText = previewTitle ? 'Titre du poste' : (displayTitle || 'Titre du poste');
+  const titleText = previewTitle ? '' : (displayTitle || '');
+  const titleHiddenClass = (previewTitle ? false : Boolean(displayTitle)) ? '' : ' hidden';
   const nfcChip = '<svg width="16" height="12" viewBox="0 0 26 18" fill="none"><rect x="0.5" y="0.5" width="25" height="17" rx="3" stroke="' + s.chip + '"/><circle cx="13" cy="9" r="3" stroke="' + s.chip + '"/></svg>';
   const nameFont = "'Alex Brush', cursive";
 %>
@@ -14,7 +15,7 @@
           <div class="flex items-start justify-between">
             <div>
               <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
-              <div class="text-[9px] mt-0.5" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+              <div class="text-[9px] mt-0.5<%= titleHiddenClass %>" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
             </div>
             <div class="flex items-center gap-1 shrink-0">
               <%- nfcChip %>
@@ -27,7 +28,7 @@
           <div class="text-[22px] leading-none" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
           <div class="flex items-center gap-1.5">
             <%- nfcChip %>
-            <span class="text-[8px]" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></span>
+            <span class="text-[8px]<%= titleHiddenClass %>" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></span>
           </div>
         </div>
 
@@ -76,7 +77,7 @@
         <div class="absolute top-2 right-2"><%- nfcChip %></div>
         <div class="relative h-full flex flex-col items-center justify-center text-center px-4">
           <div class="text-[19px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
-          <div class="text-[8px] mt-0.5 uppercase tracking-wide" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+          <div class="text-[8px] mt-0.5 uppercase tracking-wide<%= titleHiddenClass %>" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
         </div>
 
       <% } else if (s.id === 'eco-nature') { %>
@@ -87,7 +88,7 @@
           </div>
           <div>
             <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
-            <div class="text-[9px] mt-0.5" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+            <div class="text-[9px] mt-0.5<%= titleHiddenClass %>" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
             <div class="text-[7px] mt-1 opacity-80"><%= s.caption %></div>
           </div>
         </div>
@@ -133,7 +134,7 @@
           </div>
           <div class="text-[18px] leading-tight" style="font-family: <%= nameFont %>;" <%= nameAttr %>><%= nameText %></div>
           <div class="w-6 h-px" style="background: <%= s.sub %>;"></div>
-          <div class="text-[9px]" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
+          <div class="text-[9px]<%= titleHiddenClass %>" style="color: <%= s.sub %>;" <%= titleAttr %>><%= titleText %></div>
         </div>
 
       <% } %>
