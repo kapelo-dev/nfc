@@ -39,7 +39,10 @@ app.use(helmet({
       frameAncestors: ["'self'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
-      formAction: ["'self'"]
+      // 'self' alone blocks this: browsers enforce form-action on the redirect chain that
+      // follows a form submission too, not just the form's own action="" target — and the
+      // order form's POST ends in a 302 to GeniusPay's checkout page.
+      formAction: ["'self'", 'https://geniuspay.ci']
     }
   },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
