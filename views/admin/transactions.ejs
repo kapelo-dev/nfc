@@ -1,0 +1,60 @@
+<%- include('partials/shell-open', { title: 'Transactions', active: 'transactions' }) %>
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1">Transactions</h1>
+    <p class="text-sm text-secondary-foreground">Historique des paiements Genius Pay (commandes et liens envoyés manuellement)</p>
+  </div>
+</div>
+
+<div class="kt-card">
+  <div class="kt-card-content p-0">
+    <% if (transactions.length === 0) { %>
+      <div class="flex flex-col items-center text-center gap-3 py-16 px-6">
+        <span class="flex items-center justify-center size-12 rounded-full bg-accent text-muted-foreground">
+          <i class="ki-filled ki-dollar text-xl"></i>
+        </span>
+        <p class="text-sm text-secondary-foreground">Aucune transaction pour le moment.</p>
+      </div>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="kt-table kt-table-border align-middle">
+          <thead>
+            <tr>
+              <th class="min-w-[160px]">Client</th>
+              <th class="min-w-[140px]">Contact</th>
+              <th class="min-w-[120px]">Montant</th>
+              <th class="min-w-[120px]">Statut</th>
+              <th class="min-w-[120px]">Moyen</th>
+              <th class="min-w-[160px]">Référence</th>
+              <th class="min-w-[140px]">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% transactions.forEach(tx => { %>
+              <tr>
+                <td class="text-sm font-medium text-mono"><%= tx.card_name || '-' %></td>
+                <td class="text-sm text-secondary-foreground"><%= tx.contact_phone || '-' %></td>
+                <td class="text-sm text-secondary-foreground"><%= Number(tx.amount).toLocaleString('fr-FR') %> FCFA</td>
+                <td>
+                  <% if (tx.status === 'paid') { %>
+                    <span class="kt-badge kt-badge-sm kt-badge-success kt-badge-outline">Payée</span>
+                  <% } else if (tx.status === 'failed') { %>
+                    <span class="kt-badge kt-badge-sm kt-badge-destructive kt-badge-outline">Échouée</span>
+                  <% } else { %>
+                    <span class="kt-badge kt-badge-sm kt-badge-outline">En attente</span>
+                  <% } %>
+                </td>
+                <td class="text-sm text-secondary-foreground"><%= tx.payment_method || '-' %></td>
+                <td class="text-xs text-secondary-foreground font-mono"><%= tx.reference || '-' %></td>
+                <td class="text-sm text-secondary-foreground"><%= new Date(tx.created_at).toLocaleString('fr-FR') %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/shell-close') %>

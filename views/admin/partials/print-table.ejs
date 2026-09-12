@@ -74,6 +74,11 @@
                   <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline" title="Voir recto/verso" data-kt-modal-toggle="#card_preview_modal" data-preview-trigger data-card-id="<%= card.id %>" data-card-name="<%= card.name %>">
                     <i class="ki-filled ki-eye"></i>
                   </button>
+                  <% if (card.payment_status !== 'paid' && card.contact_phone) { %>
+                    <button type="submit" formaction="/admin/cards/<%= card.id %>/send-payment-link" formtarget="_self" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline" title="Envoyer un lien de paiement par WhatsApp">
+                      <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+                    </button>
+                  <% } %>
                   <button type="submit" formaction="/admin/cards/<%= card.id %>/delete" formtarget="_self" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline kt-btn-destructive" title="Supprimer" data-confirm="Êtes-vous sûr de vouloir supprimer cette carte ?">
                     <i class="ki-filled ki-trash"></i>
                   </button>

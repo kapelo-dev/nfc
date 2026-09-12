@@ -8,7 +8,7 @@ const rateLimit = require('express-rate-limit');
 const db = require('../config/database');
 const { isAuthenticated } = require('../middleware/auth');
 const { ensureCsrf, verifyCsrf } = require('../middleware/csrf');
-const { sanitizeCardInput, sanitizeHttpsUrl } = require('../lib/sanitize');
+const { sanitizeCardInput, sanitizeHttpsUrl, sanitizePhone } = require('../lib/sanitize');
 const { categories, templates, resolve, getTheme, buildPreviewCard } = require('../config/templates');
 const { physicalStyles, resolvePhysicalStyle } = require('../config/physicalStyles');
 const { buildPrintSheet } = require('../lib/printSheet');
@@ -16,6 +16,8 @@ const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { upload, uploadBuffer, uploadDesignBuffer } = require('../config/cloudinary');
 const { sendWhatsAppMessage, sendWhatsAppDocument } = require('../lib/whatsapp');
 const { notifyApprovedCustomer } = require('../lib/cardApproval');
+const { recordTransactionInit } = require('../lib/transactions');
+const geniuspay = require('../config/geniuspay');
 const fulfillment = require('../config/fulfillment');
 
 const DUMMY_HASH = bcrypt.hashSync('timing-pad', 10);
@@ -69,9 +71,7 @@ function handlePhotoUpload(req, res, next) {
 
 async function withPendingCount(req, res, next) {
   try {
-    const [[requests]] = await db.query(
-      "SELECT COUNT(*) AS count FROM cards WHERE is_request = 1 AND (payment_status IS NULL OR payment_status = 'paid')"
-    );
+    const [[requests]] = await db.query('SELECT COUNT(*) AS count FROM cards WHERE is_request = 1');
     res.locals.pendingRequestsCount = requests.count;
     const [[toPrint]] = await db.query(
       "SELECT COUNT(*) AS count FROM cards WHERE is_active = 1 AND is_request = 0 AND (print_status IS NULL OR print_status != 'sent')"
@@ -170,9 +170,9 @@ router.get('/print-queue', isAuthenticated, withPendingCount, async (req, res) =
 
 router.get('/requests', isAuthenticated, withPendingCount, async (req, res) => {
   try {
-    const [cards] = await db.query(
-      "SELECT * FROM cards WHERE is_request = 1 AND (payment_status IS NULL OR payment_status = 'paid') ORDER BY created_at DESC"
-    );
+    // Every row still here is, by definition, not yet paid — a confirmed payment auto-approves
+    // and removes the card from this list (see routes/orders.js webhook handler).
+    const [cards] = await db.query('SELECT * FROM cards WHERE is_request = 1 ORDER BY created_at DESC');
     const physicalStyleNames = Object.fromEntries(physicalStyles.map((s) => [s.id, s.name]));
     res.render('admin/requests', { cards, socialNetworks: SOCIAL_NETWORKS, physicalStyleNames });
   } catch (error) {
@@ -228,11 +228,12 @@ router.post('/cards', isAuthenticated, handlePhotoUpload, verifyCsrf, async (req
     }
 
     const cardId = uuidv4().replace(/-/g, '');
+    const contactPhone = sanitizePhone(req.body.contact_phone);
 
     await db.query(
-      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, snapchat, tiktok, whatsapp, linkedin, instagram, facebook)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook]
+      `INSERT INTO cards (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, contact_phone, snapchat, tiktok, whatsapp, linkedin, instagram, facebook)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, contactPhone, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook]
     );
 
     res.redirect('/admin/dashboard');
@@ -289,9 +290,11 @@ router.post('/cards/:id', isAuthenticated, handlePhotoUpload, verifyCsrf, async 
       customDesignBackUrl = result.secure_url;
     }
 
+    const contactPhone = sanitizePhone(req.body.contact_phone);
+
     await db.query(
-      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, template = ?, physical_style = ?, custom_design_url = ?, custom_design_back_url = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ?, is_request = 0 WHERE id = ?`,
-      [fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook, fields.is_active ? 1 : 0, req.params.id]
+      `UPDATE cards SET name = ?, title = ?, bio = ?, photo_url = ?, theme_color = ?, template = ?, physical_style = ?, custom_design_url = ?, custom_design_back_url = ?, contact_phone = ?, snapchat = ?, tiktok = ?, whatsapp = ?, linkedin = ?, instagram = ?, facebook = ?, is_active = ?, is_request = 0 WHERE id = ?`,
+      [fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl, contactPhone, fields.snapchat, fields.tiktok, fields.whatsapp, fields.linkedin, fields.instagram, fields.facebook, fields.is_active ? 1 : 0, req.params.id]
     );
 
     res.redirect('/admin/dashboard');
@@ -464,6 +467,62 @@ router.post('/fulfillment/bulk-advance', isAuthenticated, verifyCsrf, async (req
     res.redirect('/admin/fulfillment');
   } catch (error) {
     console.error('Bulk advance fulfillment error:', error);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+router.post('/cards/:id/send-payment-link', isAuthenticated, verifyCsrf, async (req, res) => {
+  const returnTo = req.body.return_to === '/admin/requests' ? '/admin/requests' : '/admin/dashboard';
+  try {
+    const [cards] = await db.query('SELECT * FROM cards WHERE id = ?', [req.params.id]);
+    const card = cards[0];
+
+    if (!card) return res.status(404).send('Carte non trouvée');
+    if (!card.contact_phone) return res.status(400).send("Cette carte n'a pas de numéro WhatsApp renseigné.");
+    if (card.payment_status === 'paid') return res.status(400).send('Cette carte est déjà payée.');
+
+    const cardPrice = geniuspay.getCardPrice();
+    if (!geniuspay.isConfigured() || !cardPrice) {
+      return res.status(500).send("Le paiement en ligne n'est pas configuré.");
+    }
+
+    const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+    const payment = await geniuspay.createPayment({
+      amount: cardPrice,
+      description: `Carte NFC - ${card.name}`,
+      customer: { name: card.name, phone: card.contact_phone },
+      metadata: { card_id: card.id },
+      successUrl: `https://${baseUrl}/commander?envoye=1`,
+      errorUrl: `https://${baseUrl}/commander?paiement=echec`
+    });
+
+    await db.query('UPDATE cards SET payment_status = ?, payment_reference = ? WHERE id = ?', ['pending', payment.reference, card.id]);
+    await recordTransactionInit({
+      cardId: card.id,
+      reference: payment.reference,
+      amount: cardPrice,
+      contactPhone: card.contact_phone,
+      cardName: card.name
+    });
+
+    await sendWhatsAppMessage(
+      card.contact_phone,
+      `Bonjour ${card.name}, voici votre lien de paiement sécurisé pour votre carte NFC (${cardPrice.toLocaleString('fr-FR')} FCFA) :\n${payment.checkout_url || payment.payment_url}`
+    );
+
+    res.redirect(returnTo);
+  } catch (error) {
+    console.error('Send payment link error:', error);
+    res.status(500).send("Erreur lors de l'envoi du lien de paiement.");
+  }
+});
+
+router.get('/transactions', isAuthenticated, withPendingCount, async (req, res) => {
+  try {
+    const [transactions] = await db.query('SELECT * FROM transactions ORDER BY created_at DESC LIMIT 200');
+    res.render('admin/transactions', { transactions });
+  } catch (error) {
+    console.error('Transactions list error:', error);
     res.status(500).send('Erreur serveur');
   }
 });

@@ -36,7 +36,11 @@
                 <% if (card.title) { %>
                   <span class="text-xs text-secondary-foreground">· <%= card.title %></span>
                 <% } %>
-                <span class="kt-badge kt-badge-sm kt-badge-warning kt-badge-outline">En attente</span>
+                <% if (card.payment_status === 'failed') { %>
+                  <span class="kt-badge kt-badge-sm kt-badge-destructive kt-badge-outline">Paiement échoué</span>
+                <% } else { %>
+                  <span class="kt-badge kt-badge-sm kt-badge-warning kt-badge-outline">En attente de paiement</span>
+                <% } %>
                 <% if (card.physical_style) { %><span class="kt-badge kt-badge-sm kt-badge-outline"><i class="ki-filled ki-tablet-text-up"></i> <%= physicalStyleNames[card.physical_style] || card.physical_style %></span><% } %>
               </div>
               <div class="flex items-center gap-3 flex-wrap text-xs text-secondary-foreground mb-2.5">
@@ -62,9 +66,19 @@
                 <i class="ki-filled ki-eye"></i>
                 Examiner
               </a>
+              <% if (card.contact_phone) { %>
+                <form method="POST" action="/admin/cards/<%= card.id %>/send-payment-link" class="inline">
+                  <%- include('partials/csrf') %>
+                  <input type="hidden" name="return_to" value="/admin/requests">
+                  <button type="submit" class="kt-btn kt-btn-sm kt-btn-outline" title="Générer et envoyer un lien de paiement par WhatsApp">
+                    <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+                    Lien de paiement
+                  </button>
+                </form>
+              <% } %>
               <form method="POST" action="/admin/requests/<%= card.id %>/approve" class="inline">
                 <%- include('partials/csrf') %>
-                <button type="submit" class="kt-btn kt-btn-sm kt-btn-primary" title="Approuver et activer la carte">
+                <button type="submit" class="kt-btn kt-btn-sm kt-btn-primary" title="Approuver sans paiement (courtoisie, déjà payé autrement...)">
                   <i class="ki-filled ki-check"></i>
                   Approuver
                 </button>
