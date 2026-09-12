@@ -126,7 +126,7 @@
             <% physicalStyles.forEach(function(s) { %>
               <label class="flex flex-col cursor-pointer">
                 <input class="peer sr-only" type="radio" name="physical_style" value="<%= s.id %>" data-physical-option <%= selectedPhysical === s.id ? 'checked' : '' %>>
-                <%- include('../partials/physical-card', { s, qrSrc: physicalQrCodes[s.id], qrCaption: 'Scanner pour<br>commander', previewName: true, previewTitle: true, displayName: '', displayTitle: '' }) %>
+                <%- include('../partials/physical-card', { s, qrSrc: physicalQrCodes[s.id], qrCaption: 'Scanner pour<br>commander', previewName: true, previewTitle: true, displayName: '', displayTitle: '', photoUrl: card && card.photo_url ? card.photo_url : '' }) %>
                 <span class="block text-center text-xs font-medium text-mono mt-1.5"><%= s.name %></span>
               </label>
             <% }); %>

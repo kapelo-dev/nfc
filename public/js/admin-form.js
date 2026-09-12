@@ -69,6 +69,21 @@ document.addEventListener('DOMContentLoaded', function () {
   if (titleInput) titleInput.addEventListener('input', syncCardPreviewText);
   syncCardPreviewText();
 
+  const photoInput = document.getElementById('photo');
+  if (photoInput) {
+    photoInput.addEventListener('change', function () {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) return;
+      const img = document.querySelector('[data-profile-photo-preview]');
+      const placeholder = document.querySelector('[data-profile-photo-placeholder]');
+      if (img) {
+        img.src = URL.createObjectURL(file);
+        img.classList.remove('hidden');
+      }
+      if (placeholder) placeholder.classList.add('hidden');
+    });
+  }
+
   const customUploadBlock = document.querySelector('[data-custom-design-upload]');
   const customDesignInput = document.querySelector('[data-custom-design-input]');
   const physicalOptions = document.querySelectorAll('[data-physical-option]');
