@@ -108,10 +108,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const file = customDesignBackInput.files && customDesignBackInput.files[0];
       if (!file) return;
       const tile = customDesignRadio.closest('label').querySelector('[data-card-flip]');
-      const img = tile && tile.querySelector('[data-custom-design-back-preview]');
-      if (img) {
-        img.src = URL.createObjectURL(file);
-        img.classList.remove('hidden');
+      const face = tile && tile.querySelector('[data-custom-design-back-preview]');
+      if (face) {
+        face.style.backgroundImage = 'url(' + URL.createObjectURL(file) + ')';
+        face.style.backgroundSize = 'cover';
+        face.style.backgroundPosition = 'center';
       }
     });
   }
