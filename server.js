@@ -42,7 +42,9 @@ app.use(helmet({
 }));
 
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
-app.use(express.json({ limit: '32kb' }));
+// Keep the raw body around (needed to verify the GeniusPay webhook's HMAC signature,
+// which is computed over the exact bytes received, not a re-serialized copy).
+app.use(express.json({ limit: '32kb', verify: (req, res, buf) => { req.rawBody = buf.toString('utf8'); } }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 const sessionStore = new MySQLStore({

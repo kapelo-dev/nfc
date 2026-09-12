@@ -64,7 +64,9 @@ function handlePhotoUpload(req, res, next) {
 
 async function withPendingCount(req, res, next) {
   try {
-    const [[requests]] = await db.query('SELECT COUNT(*) AS count FROM cards WHERE is_request = 1');
+    const [[requests]] = await db.query(
+      "SELECT COUNT(*) AS count FROM cards WHERE is_request = 1 AND (payment_status IS NULL OR payment_status = 'paid')"
+    );
     res.locals.pendingRequestsCount = requests.count;
     const [[toPrint]] = await db.query(
       "SELECT COUNT(*) AS count FROM cards WHERE is_active = 1 AND is_request = 0 AND (print_status IS NULL OR print_status != 'sent')"
@@ -163,7 +165,9 @@ router.get('/print-queue', isAuthenticated, withPendingCount, async (req, res) =
 
 router.get('/requests', isAuthenticated, withPendingCount, async (req, res) => {
   try {
-    const [cards] = await db.query('SELECT * FROM cards WHERE is_request = 1 ORDER BY created_at DESC');
+    const [cards] = await db.query(
+      "SELECT * FROM cards WHERE is_request = 1 AND (payment_status IS NULL OR payment_status = 'paid') ORDER BY created_at DESC"
+    );
     const physicalStyleNames = Object.fromEntries(physicalStyles.map((s) => [s.id, s.name]));
     res.render('admin/requests', { cards, socialNetworks: SOCIAL_NETWORKS, physicalStyleNames });
   } catch (error) {

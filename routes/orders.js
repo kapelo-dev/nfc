@@ -11,6 +11,7 @@ const { categories, templates, resolve, getTheme } = require('../config/template
 const { physicalStyles, resolvePhysicalStyle } = require('../config/physicalStyles');
 const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { sendWhatsAppMessage } = require('../lib/whatsapp');
+const geniuspay = require('../config/geniuspay');
 
 const SOCIAL_NETWORKS = ['snapchat', 'tiktok', 'whatsapp', 'linkedin', 'instagram', 'facebook'];
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
@@ -44,6 +45,52 @@ const previewLimiter = rateLimit({
   standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: 'Trop de requêtes. Réessayez plus tard.'
+});
+
+// Registered before ensureCsrf on purpose: this endpoint is called by GeniusPay's server, not a
+// browser with our session cookie, so it has no business touching req.session (ensureCsrf would
+// otherwise mint and persist a throwaway session on every webhook delivery).
+router.post('/webhooks/geniuspay', async (req, res) => {
+  const signature = req.headers['x-webhook-signature'];
+  const timestamp = req.headers['x-webhook-timestamp'];
+
+  if (!geniuspay.verifyWebhookSignature(req.rawBody || '', signature, timestamp)) {
+    return res.status(401).json({ error: 'invalid signature' });
+  }
+
+  // Acknowledge immediately — GeniusPay expects a fast response, and any failure past this
+  // point shouldn't cause it to keep retrying a webhook we've already validated.
+  res.status(200).json({ received: true });
+
+  try {
+    const event = req.body && req.body.event;
+    const data = (req.body && req.body.data) || {};
+    const cardId = parseInt(data.metadata && data.metadata.card_id, 10);
+    if (!Number.isInteger(cardId)) return;
+
+    const [cards] = await db.query('SELECT * FROM cards WHERE id = ? AND is_request = 1', [cardId]);
+    const card = cards[0];
+    if (!card) return;
+
+    if (event === 'payment.success') {
+      if (card.payment_status === 'paid') return;
+      await db.query('UPDATE cards SET payment_status = ? WHERE id = ?', ['paid', cardId]);
+
+      const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+      const templateName = (templates.find((t) => t.id === card.template) || {}).name || card.template;
+      const styleName = (physicalStyles.find((s) => s.id === card.physical_style) || {}).name || 'Design personnalisé';
+      sendWhatsAppMessage(
+        process.env.GOWA_ADMIN_PHONE,
+        `Nouvelle commande payée\nNom : ${card.name}\nContact WhatsApp : ${card.contact_phone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la demande : https://${baseUrl}/admin/requests`
+      );
+    } else if (['payment.failed', 'payment.cancelled', 'payment.expired'].includes(event)) {
+      if (card.payment_status !== 'paid') {
+        await db.query('UPDATE cards SET payment_status = ? WHERE id = ?', ['failed', cardId]);
+      }
+    }
+  } catch (error) {
+    console.error('GeniusPay webhook processing error:', error);
+  }
 });
 
 router.use(ensureCsrf);
@@ -86,7 +133,8 @@ async function renderForm(res, status, error, submitted) {
     qrCodes,
     error,
     fields: submitted || {},
-    success: false
+    success: false,
+    cardPrice: geniuspay.getCardPrice()
   });
 }
 
@@ -101,9 +149,10 @@ router.get('/', async (req, res) => {
     physicalStyles,
     socialNetworks: SOCIAL_NETWORKS,
     qrCodes,
-    error: null,
+    error: req.query.paiement === 'echec' ? 'Le paiement a été annulé ou a échoué. Vous pouvez réessayer.' : null,
     fields,
-    success: req.query.envoye === '1'
+    success: req.query.envoye === '1',
+    cardPrice: geniuspay.getCardPrice()
   });
 });
 
@@ -115,6 +164,13 @@ router.post('/', orderLimiter, (req, res) => {
     }
 
     verifyCsrf(req, res, async () => {
+      const cardPrice = geniuspay.getCardPrice();
+      if (!geniuspay.isConfigured() || !cardPrice) {
+        console.error('GeniusPay not configured (missing API keys or CARD_PRICE_XOF)');
+        return await renderForm(res, 500, 'Le paiement en ligne n\'est pas disponible pour le moment. Merci de nous contacter directement sur WhatsApp.', req.body);
+      }
+
+      let recordId = null;
       try {
         const fields = sanitizeCardInput(req.body);
         const contactPhone = sanitizePhone(req.body.contact_phone);
@@ -167,12 +223,12 @@ router.post('/', orderLimiter, (req, res) => {
 
         const cardId = uuidv4().replace(/-/g, '');
 
-        await db.query(
+        const [insertResult] = await db.query(
           `INSERT INTO cards
-            (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, is_active, is_request, contact_phone,
+            (card_id, name, title, bio, photo_url, theme_color, template, physical_style, custom_design_url, custom_design_back_url, is_active, is_request, payment_status, contact_phone,
              snapchat, tiktok, whatsapp, linkedin, instagram, facebook,
              snapchat_photo, tiktok_photo, whatsapp_photo, linkedin_photo, instagram_photo, facebook_photo)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             cardId, fields.name, fields.title, fields.bio, photoUrl, fields.theme_color, resolve(fields.template), resolvePhysicalStyle(fields.physical_style), customDesignUrl, customDesignBackUrl,
             contactPhone,
@@ -180,19 +236,29 @@ router.post('/', orderLimiter, (req, res) => {
             socialPhotos.snapchat, socialPhotos.tiktok, socialPhotos.whatsapp, socialPhotos.linkedin, socialPhotos.instagram, socialPhotos.facebook
           ]
         );
+        recordId = insertResult.insertId;
 
         const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
-        const templateName = (templates.find((t) => t.id === resolve(fields.template)) || {}).name || fields.template;
-        const styleName = (physicalStyles.find((s) => s.id === resolvePhysicalStyle(fields.physical_style)) || {}).name || 'Design personnalisé';
-        sendWhatsAppMessage(
-          process.env.GOWA_ADMIN_PHONE,
-          `Nouvelle commande de carte NFC\nNom : ${fields.name}\nContact WhatsApp : ${contactPhone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la demande : https://${baseUrl}/admin/requests`
-        );
+        const payment = await geniuspay.createPayment({
+          amount: cardPrice,
+          description: `Carte NFC - ${fields.name}`,
+          customer: { name: fields.name, phone: contactPhone },
+          metadata: { card_id: recordId },
+          successUrl: `https://${baseUrl}/commander?envoye=1`,
+          errorUrl: `https://${baseUrl}/commander?paiement=echec`
+        });
 
-        res.redirect('/commander?envoye=1');
+        await db.query('UPDATE cards SET payment_reference = ? WHERE id = ?', [payment.reference, recordId]);
+
+        res.redirect(payment.checkout_url || payment.payment_url);
       } catch (error) {
         console.error('Order creation error:', error);
-        await renderForm(res, 500, 'Erreur lors de l\'envoi de votre demande. Merci de réessayer.', req.body);
+        if (recordId) {
+          db.query('DELETE FROM cards WHERE id = ?', [recordId]).catch((cleanupError) => {
+            console.error('Failed to clean up pending order after payment init error:', cleanupError);
+          });
+        }
+        await renderForm(res, 500, 'Erreur lors de l\'initialisation du paiement. Merci de réessayer.', req.body);
       }
     });
   });

@@ -210,16 +210,24 @@ document.addEventListener('DOMContentLoaded', function () {
     return true;
   }
 
-  const step1 = document.querySelector('[data-step="1"]');
-  const step2 = document.querySelector('[data-step="2"]');
-  const nextBtn = document.querySelector('[data-step-next]');
-  const backBtn = document.querySelector('[data-step-back]');
+  const stepEls = Array.from(document.querySelectorAll('[data-step]'));
+  const nextBtns = document.querySelectorAll('[data-step-next]');
+  const backBtns = document.querySelectorAll('[data-step-back]');
   const stepLabel = document.querySelector('[data-step-label]');
   const stepDots = document.querySelectorAll('[data-step-dot]');
+  const stepCount = stepEls.length;
+  const stepLabels = {
+    1: 'Vos informations',
+    2: 'Style web et design physique',
+    3: 'Paiement'
+  };
+  let currentStep = 1;
 
   function goToStep(n) {
-    if (step1) step1.hidden = n !== 1;
-    if (step2) step2.hidden = n !== 2;
+    currentStep = n;
+    stepEls.forEach(function (el) {
+      el.hidden = Number(el.getAttribute('data-step')) !== n;
+    });
     stepDots.forEach(function (dot) {
       const active = Number(dot.getAttribute('data-step-dot')) <= n;
       dot.classList.toggle('bg-primary', active);
@@ -228,25 +236,23 @@ document.addEventListener('DOMContentLoaded', function () {
       dot.classList.toggle('text-muted-foreground', !active);
     });
     if (stepLabel) {
-      stepLabel.textContent = n === 1
-        ? 'Étape 1 sur 2 — Vos informations'
-        : 'Étape 2 sur 2 — Style web et design physique';
+      stepLabel.textContent = 'Étape ' + n + ' sur ' + stepCount + ' — ' + (stepLabels[n] || '');
     }
     if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (n === 2) refreshPreview();
   }
 
-  if (nextBtn) {
-    nextBtn.addEventListener('click', function () {
-      if (!validateStep1()) return;
-      goToStep(2);
+  nextBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (currentStep === 1 && !validateStep1()) return;
+      goToStep(currentStep + 1);
     });
-  }
-  if (backBtn) {
-    backBtn.addEventListener('click', function () {
-      goToStep(1);
+  });
+  backBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      goToStep(currentStep - 1);
     });
-  }
+  });
 
   if (form) {
     form.addEventListener('submit', function (e) {
