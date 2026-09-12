@@ -11,6 +11,7 @@ const { categories, templates, resolve, getTheme } = require('../config/template
 const { physicalStyles, resolvePhysicalStyle } = require('../config/physicalStyles');
 const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { sendWhatsAppMessage } = require('../lib/whatsapp');
+const { notifyApprovedCustomer } = require('../lib/cardApproval');
 const geniuspay = require('../config/geniuspay');
 
 const SOCIAL_NETWORKS = ['snapchat', 'tiktok', 'whatsapp', 'linkedin', 'instagram', 'facebook'];
@@ -79,22 +80,22 @@ router.post('/webhooks/geniuspay', async (req, res) => {
 
     if (event === 'payment.success') {
       if (card.payment_status === 'paid') return;
-      await db.query('UPDATE cards SET payment_status = ? WHERE id = ?', ['paid', cardId]);
+      // A confirmed payment is the approval — no manual review step needed. This mirrors
+      // exactly what the admin "approve" button does for manually-created requests.
+      await db.query('UPDATE cards SET payment_status = ?, is_active = 1, is_request = 0 WHERE id = ?', ['paid', cardId]);
+      card.payment_status = 'paid';
+      card.is_active = 1;
+      card.is_request = 0;
 
       const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
       const templateName = (templates.find((t) => t.id === card.template) || {}).name || card.template;
       const styleName = (physicalStyles.find((s) => s.id === card.physical_style) || {}).name || 'Design personnalisé';
 
-      if (card.contact_phone) {
-        sendWhatsAppMessage(
-          card.contact_phone,
-          `Bonjour ${card.name}, nous avons bien reçu votre paiement pour votre carte NFC. Merci ! Notre équipe va maintenant vérifier votre demande avant d'activer votre carte.`
-        );
-      }
+      notifyApprovedCustomer(card);
 
       sendWhatsAppMessage(
         process.env.GOWA_ADMIN_PHONE,
-        `Nouvelle commande payée\nNom : ${card.name}\nContact WhatsApp : ${card.contact_phone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la demande : https://${baseUrl}/admin/requests`
+        `Nouvelle commande payée et activée automatiquement\nNom : ${card.name}\nContact WhatsApp : ${card.contact_phone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la carte : https://${baseUrl}/admin/dashboard`
       );
     } else if (['payment.failed', 'payment.cancelled', 'payment.expired'].includes(event)) {
       if (card.payment_status !== 'paid') {
