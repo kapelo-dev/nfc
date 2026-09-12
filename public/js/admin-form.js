@@ -87,6 +87,22 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  const removePhotoBtn = document.querySelector('[data-remove-photo]');
+  if (removePhotoBtn) {
+    removePhotoBtn.addEventListener('click', function () {
+      const existingUrlInput = document.querySelector('[data-existing-photo-url]');
+      if (existingUrlInput) existingUrlInput.value = '';
+      if (photoInput) photoInput.value = '';
+      const currentBlock = removePhotoBtn.closest('[data-photo-current]');
+      if (currentBlock) currentBlock.remove();
+      const img = document.querySelector('[data-profile-photo-preview]');
+      const placeholder = document.querySelector('[data-profile-photo-placeholder]');
+      if (img) img.classList.add('hidden');
+      if (placeholder) placeholder.classList.remove('hidden');
+      refreshPreview();
+    });
+  }
+
   const customUploadBlock = document.querySelector('[data-custom-design-upload]');
   const customDesignInput = document.querySelector('[data-custom-design-input]');
   const physicalOptions = document.querySelectorAll('[data-physical-option]');

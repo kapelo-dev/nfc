@@ -355,10 +355,6 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
     }
 
     const foundIds = cards.map((c) => c.id);
-    await db.query(
-      "UPDATE cards SET print_status = 'sent', sent_to_print_at = NOW() WHERE id IN (?)",
-      [foundIds]
-    );
 
     const doc = new PDFDocument({ size: 'A4', margin: 0 });
     const chunks = [];
@@ -367,6 +363,11 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
     await buildPrintSheet(doc, cards, { baseUrl: process.env.BASE_DOMAIN });
     doc.end();
     await pdfDone;
+
+    await db.query(
+      "UPDATE cards SET print_status = 'sent', sent_to_print_at = NOW() WHERE id IN (?)",
+      [foundIds]
+    );
 
     const pdfBuffer = Buffer.concat(chunks);
     const filename = `planche-impression-${Date.now()}.pdf`;

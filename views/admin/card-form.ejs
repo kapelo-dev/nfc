@@ -69,13 +69,16 @@
             <div class="flex flex-col gap-1">
               <label class="kt-form-label font-normal text-mono" for="photo">Photo de profil</label>
               <% if (card && card.photo_url) { %>
-                <div class="flex items-center gap-3 mb-1.5">
+                <div class="flex items-center gap-3 mb-1.5" data-photo-current>
                   <img src="<%= card.photo_url %>" alt="Photo actuelle" class="size-14 rounded-full object-cover border border-border">
                   <span class="text-xs text-secondary-foreground">Photo actuelle — choisissez un fichier pour la remplacer</span>
+                  <button type="button" class="kt-btn kt-btn-sm kt-btn-icon kt-btn-outline kt-btn-destructive ms-auto shrink-0" data-remove-photo title="Retirer la photo">
+                    <i class="ki-filled ki-trash"></i>
+                  </button>
                 </div>
               <% } %>
               <input class="kt-input" id="photo" name="photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp">
-              <input type="hidden" name="existing_photo_url" value="<%= card ? card.photo_url : '' %>">
+              <input type="hidden" name="existing_photo_url" value="<%= card ? card.photo_url : '' %>" data-existing-photo-url>
             </div>
 
             <div class="flex flex-col gap-1">
