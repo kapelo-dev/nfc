@@ -42,9 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
   const shell = document.querySelector('[data-sidebar-collapsed]');
   if (sidebarToggle && shell) {
-    if (localStorage.getItem('sidebarCollapsed') === '1') {
-      shell.setAttribute('data-sidebar-collapsed', 'true');
-    }
     sidebarToggle.addEventListener('click', function (event) {
       // At desktop width the sidebar is a static column, not KTDrawer's mobile overlay —
       // stop the click from also reaching KTDrawer's delegated handler (which would add
@@ -54,7 +51,10 @@ document.addEventListener('DOMContentLoaded', function () {
         event.stopPropagation();
         const collapsed = shell.getAttribute('data-sidebar-collapsed') === 'true';
         shell.setAttribute('data-sidebar-collapsed', collapsed ? 'false' : 'true');
-        localStorage.setItem('sidebarCollapsed', collapsed ? '0' : '1');
+        // A cookie (not localStorage) so the server can render the correct layout on the very
+        // first response — applying this client-side only would flash the expanded sidebar
+        // on every navigation before JS gets a chance to collapse it again.
+        document.cookie = 'sidebarCollapsed=' + (collapsed ? '0' : '1') + '; path=/; max-age=31536000; samesite=lax';
       }
     });
   }

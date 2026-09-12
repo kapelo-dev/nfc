@@ -29,6 +29,16 @@ const loginLimiter = rateLimit({
 
 router.use(ensureCsrf);
 
+// Reads the sidebar-collapsed preference from a plain cookie (no cookie-parser dependency needed
+// for a single boolean flag) so the very first server-rendered HTML already has the right layout —
+// applying this only client-side after the page loads causes a visible "open then collapse" flash.
+router.use((req, res, next) => {
+  const header = req.headers.cookie || '';
+  const match = header.split(';').map((c) => c.trim()).find((c) => c.startsWith('sidebarCollapsed='));
+  res.locals.sidebarCollapsed = match ? match.slice('sidebarCollapsed='.length) === '1' : false;
+  next();
+});
+
 const SOCIAL_NETWORKS = ['snapchat', 'tiktok', 'whatsapp', 'linkedin', 'instagram', 'facebook'];
 
 async function formLocals(card, error) {

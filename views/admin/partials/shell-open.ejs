@@ -9,7 +9,7 @@
   <% if (typeof extraHead !== 'undefined') { %><%- extraHead %><% } %>
 </head>
 <body class="antialiased h-full text-base text-foreground bg-background">
-  <div class="flex h-full group/shell" data-sidebar-collapsed="false">
+  <div class="flex h-full group/shell" data-sidebar-collapsed="<%= typeof sidebarCollapsed !== 'undefined' && sidebarCollapsed ? 'true' : 'false' %>">
     <%
       const navItems = [
         { key: 'dashboard', href: '/admin/dashboard', icon: 'ki-element-11', label: 'Tableau de bord' },
