@@ -9,8 +9,8 @@
   <% if (typeof extraHead !== 'undefined') { %><%- extraHead %><% } %>
 </head>
 <body class="antialiased h-full text-base text-foreground bg-background">
-  <div class="flex h-full">
-    <aside class="bg-background border-e border-e-border fixed inset-y-0 start-0 z-30 hidden w-[280px] lg:flex flex-col items-stretch shrink-0 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0 bg-background" id="sidebar">
+  <div class="flex h-full group/shell" data-sidebar-collapsed="false">
+    <aside class="bg-background border-e border-e-border fixed inset-y-0 start-0 z-30 hidden w-[280px] lg:flex lg:group-data-[sidebar-collapsed=true]/shell:hidden flex-col items-stretch shrink-0 [--kt-drawer-enable:true] lg:[--kt-drawer-enable:false]" data-kt-drawer="true" data-kt-drawer-class="kt-drawer kt-drawer-start top-0 bottom-0 bg-background" id="sidebar">
       <div class="flex items-center justify-between px-5 h-[70px] shrink-0 border-b border-border">
         <a class="flex items-center gap-2.5 text-mono font-semibold text-base leading-none" href="/admin/dashboard">
           <span class="flex items-center justify-center size-8 rounded-lg bg-primary/10 text-primary shrink-0">
@@ -41,6 +41,10 @@
             <span class="kt-badge kt-badge-sm kt-badge-info ms-auto"><%= pendingPrintCount %></span>
           <% } %>
         </a>
+        <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'fulfillment' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/fulfillment">
+          <i class="ki-filled ki-package text-lg w-5 text-center <%= active === 'fulfillment' ? 'text-primary' : 'text-muted-foreground' %>"></i>
+          Suivi fabrication
+        </a>
         <a class="flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors <%= active === 'cards' ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-accent' %>" href="/admin/cards/new">
           <i class="ki-filled ki-plus-circle text-lg w-5 text-center <%= active === 'cards' ? 'text-primary' : 'text-muted-foreground' %>"></i>
           Nouvelle carte
@@ -48,14 +52,14 @@
       </nav>
     </aside>
 
-    <div class="flex flex-col grow lg:ps-[280px] min-h-full">
+    <div class="flex flex-col grow lg:ps-[280px] lg:group-data-[sidebar-collapsed=true]/shell:ps-0 min-h-full" data-content-wrapper>
       <header class="sticky top-0 z-20 flex items-stretch shrink-0 bg-background border-b border-border">
         <div class="flex justify-between items-center gap-4 px-4 lg:px-6 w-full h-[70px]">
           <div class="flex items-center gap-2.5">
-            <button class="kt-btn kt-btn-icon kt-btn-ghost lg:hidden" data-kt-drawer-toggle="#sidebar" type="button">
+            <button class="kt-btn kt-btn-icon kt-btn-ghost" data-kt-drawer-toggle="#sidebar" data-sidebar-toggle type="button" title="Ouvrir/fermer le menu">
               <i class="ki-filled ki-burger-menu text-lg"></i>
             </button>
-            <span class="text-base font-medium text-mono lg:hidden">NFC Card Manager</span>
+            <span class="text-base font-medium text-mono">NFC Card Manager</span>
           </div>
           <div class="flex items-center gap-3">
             <div data-kt-dropdown="true" data-kt-dropdown-placement="bottom-end" data-kt-dropdown-trigger="click">

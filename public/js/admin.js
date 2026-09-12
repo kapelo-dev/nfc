@@ -8,32 +8,55 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  const printForm = document.getElementById('print_form');
-  const selectAll = document.querySelector('[data-print-select-all]');
-  const printCount = document.querySelector('[data-print-count]');
-  const printSubmit = document.getElementById('print_submit');
+  function setupBulkSelect(formId, selectAllAttr, selectAttr, countAttr, submitId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const selectAll = document.querySelector(selectAllAttr);
+    const countEl = document.querySelector(countAttr);
+    const submitBtn = document.getElementById(submitId);
+    const checkboxes = () => Array.from(form.querySelectorAll(selectAttr));
 
-  if (printForm) {
-    const checkboxes = () => Array.from(printForm.querySelectorAll('[data-print-select]'));
-
-    function updatePrintUi() {
+    function update() {
       const checked = checkboxes().filter((cb) => cb.checked);
-      if (printCount) printCount.textContent = checked.length + ' carte(s) sélectionnée(s)';
-      if (printSubmit) printSubmit.disabled = checked.length === 0;
+      if (countEl) countEl.textContent = checked.length + ' carte(s) sélectionnée(s)';
+      if (submitBtn) submitBtn.disabled = checked.length === 0;
     }
 
     if (selectAll) {
       selectAll.addEventListener('change', function () {
         checkboxes().forEach((cb) => { cb.checked = selectAll.checked; });
-        updatePrintUi();
+        update();
       });
     }
 
-    printForm.addEventListener('change', function (e) {
-      if (e.target.matches('[data-print-select]')) updatePrintUi();
+    form.addEventListener('change', function (e) {
+      if (e.target.matches(selectAttr)) update();
     });
 
-    updatePrintUi();
+    update();
+  }
+
+  setupBulkSelect('print_form', '[data-print-select-all]', '[data-print-select]', '[data-print-count]', 'print_submit');
+  setupBulkSelect('fulfillment_form', '[data-fulfillment-select-all]', '[data-fulfillment-select]', '[data-fulfillment-count]', 'fulfillment_submit');
+
+  const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
+  const shell = document.querySelector('[data-sidebar-collapsed]');
+  if (sidebarToggle && shell) {
+    if (localStorage.getItem('sidebarCollapsed') === '1') {
+      shell.setAttribute('data-sidebar-collapsed', 'true');
+    }
+    sidebarToggle.addEventListener('click', function (event) {
+      // At desktop width the sidebar is a static column, not KTDrawer's mobile overlay —
+      // stop the click from also reaching KTDrawer's delegated handler (which would add
+      // an unwanted dark backdrop). Below the lg breakpoint, let it bubble so KTDrawer
+      // still handles the real off-canvas drawer as before.
+      if (window.innerWidth >= 1024) {
+        event.stopPropagation();
+        const collapsed = shell.getAttribute('data-sidebar-collapsed') === 'true';
+        shell.setAttribute('data-sidebar-collapsed', collapsed ? 'false' : 'true');
+        localStorage.setItem('sidebarCollapsed', collapsed ? '0' : '1');
+      }
+    });
   }
 
   // Delegated so it also works on content injected later (e.g. the card preview modal).

@@ -15,6 +15,7 @@ const { buildPrintSheet } = require('../lib/printSheet');
 const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { upload, uploadBuffer, uploadDesignBuffer } = require('../config/cloudinary');
 const { sendWhatsAppMessage, sendWhatsAppDocument } = require('../lib/whatsapp');
+const fulfillment = require('../config/fulfillment');
 
 const DUMMY_HASH = bcrypt.hashSync('timing-pad', 10);
 
@@ -385,6 +386,66 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
   } catch (error) {
     console.error('Print sheet error:', error);
     if (!res.headersSent) res.status(500).send('Erreur lors de la génération du PDF.');
+  }
+});
+
+router.get('/fulfillment', isAuthenticated, withPendingCount, async (req, res) => {
+  try {
+    const [cards] = await db.query(
+      "SELECT * FROM cards WHERE is_active = 1 AND is_request = 0 AND print_status = 'sent' ORDER BY sent_to_print_at ASC"
+    );
+    cards.forEach((card) => {
+      card.nextStage = fulfillment.nextStage(card.fulfillment_status);
+    });
+    res.render('admin/fulfillment', { cards, labels: fulfillment.LABELS, badgeClasses: fulfillment.BADGE_CLASSES });
+  } catch (error) {
+    console.error('Fulfillment list error:', error);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+async function advanceFulfillment(card) {
+  const next = fulfillment.nextStage(card.fulfillment_status);
+  if (!next) return null;
+  await db.query('UPDATE cards SET fulfillment_status = ? WHERE id = ?', [next, card.id]);
+  if (card.contact_phone) {
+    const message = fulfillment.messageFor(next, card.name);
+    sendWhatsAppMessage(card.contact_phone, message);
+  }
+  return next;
+}
+
+router.post('/fulfillment/:id/advance', isAuthenticated, verifyCsrf, async (req, res) => {
+  try {
+    const [cards] = await db.query('SELECT * FROM cards WHERE id = ?', [req.params.id]);
+    if (cards.length === 0) return res.status(404).send('Carte non trouvée');
+    await advanceFulfillment(cards[0]);
+    res.redirect('/admin/fulfillment');
+  } catch (error) {
+    console.error('Advance fulfillment error:', error);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+router.post('/fulfillment/bulk-advance', isAuthenticated, verifyCsrf, async (req, res) => {
+  let ids = req.body.card_ids;
+  if (!ids) ids = [];
+  if (!Array.isArray(ids)) ids = [ids];
+  ids = [...new Set(ids.map((id) => parseInt(id, 10)).filter((id) => Number.isInteger(id) && id > 0))].slice(0, 200);
+
+  if (ids.length === 0) {
+    return res.status(400).send('Aucune carte sélectionnée.');
+  }
+
+  try {
+    const [cards] = await db.query('SELECT * FROM cards WHERE id IN (?)', [ids]);
+    for (const card of cards) {
+      await advanceFulfillment(card);
+    }
+    res.redirect('/admin/fulfillment');
+  } catch (error) {
+    console.error('Bulk advance fulfillment error:', error);
+    res.status(500).send('Erreur serveur');
   }
 });
 

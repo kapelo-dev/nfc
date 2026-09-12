@@ -1,0 +1,80 @@
+<%- include('partials/shell-open', { title: 'Suivi fabrication', active: 'fulfillment' }) %>
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1">Suivi fabrication</h1>
+    <p class="text-sm text-secondary-foreground">Suivez chaque carte envoyée à l'impression, de la production jusqu'au retrait</p>
+  </div>
+</div>
+
+<div class="kt-card">
+  <div class="kt-card-content p-0">
+    <% if (cards.length === 0) { %>
+      <div class="flex flex-col items-center text-center gap-3 py-16 px-6">
+        <span class="flex items-center justify-center size-12 rounded-full bg-accent text-muted-foreground">
+          <i class="ki-filled ki-package text-xl"></i>
+        </span>
+        <p class="text-sm text-secondary-foreground">Aucune carte envoyée à l'impression pour le moment.</p>
+      </div>
+    <% } else { %>
+      <form method="POST" action="/admin/fulfillment/bulk-advance" id="fulfillment_form">
+        <%- include('partials/csrf') %>
+        <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-accent/30">
+          <span class="text-xs text-secondary-foreground" data-fulfillment-count>0 carte(s) sélectionnée(s)</span>
+          <button type="submit" class="kt-btn kt-btn-sm kt-btn-primary ms-auto" id="fulfillment_submit" disabled>
+            <i class="ki-filled ki-double-check"></i>
+            Faire avancer la sélection
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="kt-table kt-table-border align-middle">
+            <thead>
+              <tr>
+                <th class="w-[40px]">
+                  <input type="checkbox" class="kt-checkbox" data-fulfillment-select-all>
+                </th>
+                <th class="min-w-[160px]">Nom</th>
+                <th class="min-w-[140px]">Contact</th>
+                <th class="min-w-[120px]">Statut</th>
+                <th class="min-w-[130px]">Envoyée le</th>
+                <th class="min-w-[200px]">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% cards.forEach(card => { %>
+                <tr>
+                  <td>
+                    <% if (card.nextStage) { %>
+                      <input type="checkbox" class="kt-checkbox" name="card_ids" value="<%= card.id %>" data-fulfillment-select>
+                    <% } %>
+                  </td>
+                  <td class="text-sm font-medium text-mono"><%= card.name %></td>
+                  <td class="text-sm text-secondary-foreground"><%= card.contact_phone || '-' %></td>
+                  <td>
+                    <% if (card.fulfillment_status) { %>
+                      <span class="kt-badge kt-badge-sm <%= badgeClasses[card.fulfillment_status] %> kt-badge-outline"><%= labels[card.fulfillment_status] %></span>
+                    <% } else { %>
+                      <span class="kt-badge kt-badge-sm kt-badge-outline">Non démarré</span>
+                    <% } %>
+                  </td>
+                  <td class="text-sm text-secondary-foreground"><%= card.sent_to_print_at ? new Date(card.sent_to_print_at).toLocaleDateString('fr-FR') : '-' %></td>
+                  <td>
+                    <% if (card.nextStage) { %>
+                      <button type="submit" formaction="/admin/fulfillment/<%= card.id %>/advance" class="kt-btn kt-btn-sm kt-btn-outline">
+                        Passer à « <%= labels[card.nextStage] %> »
+                      </button>
+                    <% } else { %>
+                      <span class="text-xs text-secondary-foreground">Terminé</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/shell-close') %>
