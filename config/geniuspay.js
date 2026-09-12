@@ -19,7 +19,19 @@ function authHeaders() {
   };
 }
 
+// Temporary diagnostic: sandbox vs live is decided entirely by GeniusPay based on which API
+// key is sent (this codebase never picks a sandbox/live URL itself), so when a "live" checkout
+// still comes back sandboxed, the only way to tell whether it's a wrong/stale Vercel env var or
+// a GeniusPay-side account issue is to see exactly what was sent and got back. Logs only the
+// last 4 characters of the key, never the secret. Remove once this is resolved.
+function maskKey(key) {
+  if (!key) return '(vide)';
+  return key.length <= 4 ? '****' : `...${key.slice(-4)}`;
+}
+
 async function createPayment({ amount, description, customer, metadata, successUrl, errorUrl }) {
+  console.log(`GeniusPay: création paiement avec la clé API ${maskKey(process.env.GENIUSPAY_API_KEY)}`);
+
   const res = await fetch(`${BASE_URL}/payments`, {
     method: 'POST',
     headers: authHeaders(),
@@ -38,6 +50,7 @@ async function createPayment({ amount, description, customer, metadata, successU
     const message = (json && json.error && json.error.message) || `GeniusPay error (${res.status})`;
     throw new Error(message);
   }
+  console.log('GeniusPay: réponse reçue', JSON.stringify(json.data));
   return json.data;
 }
 
