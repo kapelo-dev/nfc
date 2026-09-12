@@ -54,7 +54,7 @@
                     <% if (card.fulfillment_status) { %>
                       <span class="kt-badge kt-badge-sm <%= badgeClasses[card.fulfillment_status] %> kt-badge-outline"><%= labels[card.fulfillment_status] %></span>
                     <% } else { %>
-                      <span class="kt-badge kt-badge-sm kt-badge-outline">Non démarré</span>
+                      <span class="kt-badge kt-badge-sm <%= badgeClasses.production %> kt-badge-outline"><%= labels.production %></span>
                     <% } %>
                   </td>
                   <td class="text-sm text-secondary-foreground"><%= card.sent_to_print_at ? new Date(card.sent_to_print_at).toLocaleDateString('fr-FR') : '-' %></td>

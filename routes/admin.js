@@ -370,6 +370,12 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
       [foundIds]
     );
 
+    cards.forEach((card) => {
+      if (card.contact_phone) {
+        sendWhatsAppMessage(card.contact_phone, fulfillment.messageFor('production', card.name));
+      }
+    });
+
     const pdfBuffer = Buffer.concat(chunks);
     const filename = `planche-impression-${Date.now()}.pdf`;
 

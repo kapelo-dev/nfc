@@ -1,4 +1,7 @@
-const STAGES = ['production', 'ready', 'withdrawn'];
+// "En production" isn't a stage here — it's the same event as sending the card to print
+// (see routes/admin.js POST /print), which already notifies the client. This pipeline only
+// covers what comes after that: the card is ready, then withdrawn.
+const STAGES = ['ready', 'withdrawn'];
 
 const LABELS = {
   production: 'En production',
