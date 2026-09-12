@@ -84,6 +84,14 @@ router.post('/webhooks/geniuspay', async (req, res) => {
       const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
       const templateName = (templates.find((t) => t.id === card.template) || {}).name || card.template;
       const styleName = (physicalStyles.find((s) => s.id === card.physical_style) || {}).name || 'Design personnalisé';
+
+      if (card.contact_phone) {
+        sendWhatsAppMessage(
+          card.contact_phone,
+          `Bonjour ${card.name}, nous avons bien reçu votre paiement pour votre carte NFC. Merci ! Notre équipe va maintenant vérifier votre demande avant d'activer votre carte.`
+        );
+      }
+
       sendWhatsAppMessage(
         process.env.GOWA_ADMIN_PHONE,
         `Nouvelle commande payée\nNom : ${card.name}\nContact WhatsApp : ${card.contact_phone}\nStyle web : ${templateName}\nDesign physique : ${styleName}\nVoir la demande : https://${baseUrl}/admin/requests`
