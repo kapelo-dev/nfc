@@ -397,13 +397,32 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
 
 router.get('/fulfillment', isAuthenticated, withPendingCount, async (req, res) => {
   try {
-    const [cards] = await db.query(
+    const [allCards] = await db.query(
       "SELECT * FROM cards WHERE is_active = 1 AND is_request = 0 AND print_status = 'sent' ORDER BY sent_to_print_at ASC"
     );
-    cards.forEach((card) => {
+    allCards.forEach((card) => {
       card.nextStage = fulfillment.nextStage(card.fulfillment_status);
     });
-    res.render('admin/fulfillment', { cards, labels: fulfillment.LABELS, badgeClasses: fulfillment.BADGE_CLASSES });
+
+    const counts = { production: 0, ready: 0, withdrawn: 0 };
+    allCards.forEach((card) => {
+      const key = card.fulfillment_status || 'production';
+      counts[key] = (counts[key] || 0) + 1;
+    });
+
+    const statusFilter = fulfillment.LABELS[req.query.status] ? req.query.status : '';
+    const cards = statusFilter
+      ? allCards.filter((card) => (card.fulfillment_status || 'production') === statusFilter)
+      : allCards;
+
+    res.render('admin/fulfillment', {
+      cards,
+      labels: fulfillment.LABELS,
+      badgeClasses: fulfillment.BADGE_CLASSES,
+      counts,
+      total: allCards.length,
+      statusFilter
+    });
   } catch (error) {
     console.error('Fulfillment list error:', error);
     res.status(500).send('Erreur serveur');

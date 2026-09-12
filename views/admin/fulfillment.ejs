@@ -7,6 +7,13 @@
   </div>
 </div>
 
+<div class="flex flex-wrap items-center gap-2 mb-4">
+  <a href="/admin/fulfillment" class="kt-btn kt-btn-sm <%= statusFilter === '' ? 'kt-btn-primary' : 'kt-btn-outline' %>">Toutes (<%= total %>)</a>
+  <a href="/admin/fulfillment?status=production" class="kt-btn kt-btn-sm <%= statusFilter === 'production' ? 'kt-btn-primary' : 'kt-btn-outline' %>">En production (<%= counts.production %>)</a>
+  <a href="/admin/fulfillment?status=ready" class="kt-btn kt-btn-sm <%= statusFilter === 'ready' ? 'kt-btn-primary' : 'kt-btn-outline' %>">Prête (<%= counts.ready %>)</a>
+  <a href="/admin/fulfillment?status=withdrawn" class="kt-btn kt-btn-sm <%= statusFilter === 'withdrawn' ? 'kt-btn-primary' : 'kt-btn-outline' %>">Retirée (<%= counts.withdrawn %>)</a>
+</div>
+
 <div class="kt-card">
   <div class="kt-card-content p-0">
     <% if (cards.length === 0) { %>
@@ -14,7 +21,9 @@
         <span class="flex items-center justify-center size-12 rounded-full bg-accent text-muted-foreground">
           <i class="ki-filled ki-package text-xl"></i>
         </span>
-        <p class="text-sm text-secondary-foreground">Aucune carte envoyée à l'impression pour le moment.</p>
+        <p class="text-sm text-secondary-foreground">
+          <% if (statusFilter) { %>Aucune carte avec le statut « <%= labels[statusFilter] %> ».<% } else { %>Aucune carte envoyée à l'impression pour le moment.<% } %>
+        </p>
       </div>
     <% } else { %>
       <form method="POST" action="/admin/fulfillment/bulk-advance" id="fulfillment_form">
