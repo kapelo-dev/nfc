@@ -9,6 +9,18 @@
   html, body { margin: 0; padding: 0; background: #fff; }
   /* Print capture only — the on-screen flip affordance has no place on the physical card. */
   [data-flip-trigger] { display: none !important; }
+  /* The web preview rounds the card's own outer corners (Tailwind's rounded-xl, used only by
+     the card shape itself — never by inner decorative elements like the photo box or the "VN"
+     avatar circle) for on-screen display. That rounding gets baked into the raster as opaque
+     white (the page background) once screenshotted — placed into a full-bleed PDF, that shows
+     up as a white notch at each corner instead of the background bleeding to the edge.
+     Corner-rounding on the finished card is a physical cutting step done by the printer, not
+     something the artwork itself should draw, so force square corners on the card shape only
+     for this capture. */
+  [data-card-flip].rounded-xl,
+  [data-card-flip] .rounded-xl {
+    border-radius: 0 !important;
+  }
   .render-scale {
     width: <%= nativeW %>px;
     transform: scale(<%= scale %>);
