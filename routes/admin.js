@@ -24,6 +24,10 @@ const loginLimiter = rateLimit({
   limit: 10,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  // Express doesn't parse the standardized "Forwarded" header (only X-Forwarded-*), so
+  // express-rate-limit warns that it's present but unused — harmless here since trust proxy
+  // already derives req.ip correctly from X-Forwarded-For, which Vercel always sets too.
+  validate: { forwardedHeader: false },
   message: 'Trop de tentatives. Réessayez plus tard.'
 });
 

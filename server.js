@@ -14,15 +14,15 @@ const orderRoutes = require('./routes/orders');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Vercel always sits in front of the app as a proxy and serves it over HTTPS, regardless of
-// NODE_ENV (which its legacy `builds` config doesn't set to "production" the way its zero-config
-// framework builds do) — without treating a Vercel deployment as prod, express-rate-limit refuses
-// to trust X-Forwarded-For and throws at startup, and the session cookie would skip `secure`.
 const isProd = process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL);
 
-if (isProd) {
-  app.set('trust proxy', 1);
-}
+// Always trust the first proxy hop. In production this is Vercel's edge (which adds
+// X-Forwarded-For on every request, so express-rate-limit needs this to avoid throwing);
+// locally there's no proxy in front, so these headers simply won't be present and this has
+// no effect. Deliberately not gated on isProd — process.env.VERCEL isn't populated unless a
+// project has "Automatically expose System Environment Variables" enabled, so relying on it
+// alone left this unset in production.
+app.set('trust proxy', 1);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));

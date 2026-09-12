@@ -36,6 +36,10 @@ const orderLimiter = rateLimit({
   limit: 5,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  // Express doesn't parse the standardized "Forwarded" header (only X-Forwarded-*), so
+  // express-rate-limit warns that it's present but unused — harmless here since trust proxy
+  // already derives req.ip correctly from X-Forwarded-For, which Vercel always sets too.
+  validate: { forwardedHeader: false },
   message: 'Trop de demandes envoyées. Réessayez plus tard.'
 });
 
@@ -44,6 +48,7 @@ const previewLimiter = rateLimit({
   limit: 600,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
+  validate: { forwardedHeader: false },
   message: 'Trop de requêtes. Réessayez plus tard.'
 });
 
