@@ -18,6 +18,7 @@ const { sendWhatsAppMessage, sendWhatsAppDocument } = require('../lib/whatsapp')
 const { notifyApprovedCustomer } = require('../lib/cardApproval');
 const { recordTransactionInit } = require('../lib/transactions');
 const geniuspay = require('../config/geniuspay');
+const { getBaseDomain } = require('../config/env');
 const fulfillment = require('../config/fulfillment');
 
 const DUMMY_HASH = bcrypt.hashSync('timing-pad', 10);
@@ -319,7 +320,7 @@ router.get('/cards/:id/card-preview', isAuthenticated, async (req, res) => {
     const styleId = resolvePhysicalStyle(card.physical_style);
     const style = physicalStyles.find((s) => s.id === styleId) || null;
     const styleName = styleId === 'custom' ? 'Design personnalisé' : style.name;
-    const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+    const baseUrl = getBaseDomain();
     const orderUrl = `https://${baseUrl}/commander?physical=${encodeURIComponent(styleId)}`;
     const qrSrc = await QRCode.toDataURL(orderUrl, {
       width: 260,
@@ -360,7 +361,7 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
     const chunks = [];
     doc.on('data', (chunk) => chunks.push(chunk));
     const pdfDone = new Promise((resolve) => doc.on('end', resolve));
-    await buildPrintSheet(doc, cards, { baseUrl: process.env.BASE_DOMAIN });
+    await buildPrintSheet(doc, cards, { baseUrl: getBaseDomain() });
     doc.end();
     await pdfDone;
 
@@ -490,7 +491,7 @@ router.post('/cards/:id/send-payment-link', isAuthenticated, verifyCsrf, async (
       return res.status(500).send("Le paiement en ligne n'est pas configuré.");
     }
 
-    const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+    const baseUrl = getBaseDomain();
     const payment = await geniuspay.createPayment({
       amount: cardPrice,
       description: `Carte NFC - ${card.name}`,

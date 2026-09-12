@@ -52,8 +52,18 @@ function requireAdminPassword() {
   return password;
 }
 
+// Every call site builds URLs as `https://${baseDomain}/...` — BASE_DOMAIN is meant to be a
+// bare host (e.g. "moncardnfc.com"), but it's an easy mistake to paste it with a scheme and/or
+// a trailing slash (e.g. "https://moncardnfc.com/"), which silently produces broken
+// "https://https://..." URLs. Strip both defensively instead of trusting every env var value.
+function getBaseDomain() {
+  const raw = process.env.BASE_DOMAIN || 'localhost:3000';
+  return raw.replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+}
+
 module.exports = {
   dbConfig,
   requireSessionSecret,
-  requireAdminPassword
+  requireAdminPassword,
+  getBaseDomain
 };

@@ -14,6 +14,7 @@ const { sendWhatsAppMessage } = require('../lib/whatsapp');
 const { notifyApprovedCustomer } = require('../lib/cardApproval');
 const { recordTransactionInit, updateTransactionStatus } = require('../lib/transactions');
 const geniuspay = require('../config/geniuspay');
+const { getBaseDomain } = require('../config/env');
 
 const SOCIAL_NETWORKS = ['snapchat', 'tiktok', 'whatsapp', 'linkedin', 'instagram', 'facebook'];
 const ALLOWED_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
@@ -91,7 +92,7 @@ router.post('/webhooks/geniuspay', async (req, res) => {
       await updateTransactionStatus(reference, 'paid', paymentMethod);
       card.payment_status = 'paid';
 
-      const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+      const baseUrl = getBaseDomain();
       const templateName = (templates.find((t) => t.id === card.template) || {}).name || card.template;
       const styleName = (physicalStyles.find((s) => s.id === card.physical_style) || {}).name || 'Design personnalisé';
 
@@ -267,7 +268,7 @@ router.post('/', orderLimiter, (req, res) => {
         );
         recordId = insertResult.insertId;
 
-        const baseUrl = process.env.BASE_DOMAIN || 'localhost:3000';
+        const baseUrl = getBaseDomain();
         const payment = await geniuspay.createPayment({
           amount: cardPrice,
           description: `Carte NFC - ${fields.name}`,
