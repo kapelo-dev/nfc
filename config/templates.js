@@ -35,8 +35,8 @@ function buildPreviewCard(input) {
   };
   const card = {
     name: src.name || 'Alex Martin',
-    title: src.title || 'Créateur de contenu',
-    bio: src.bio || 'Voici un aperçu de votre carte NFC.',
+    title: src.title,
+    bio: src.bio,
     photo_url: src.photo_url,
     theme_color: src.theme_color,
     template: resolve(src.template)
