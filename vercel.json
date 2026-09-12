@@ -5,9 +5,7 @@
       "src": "server.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": "node_modules/pdfkit/js/standard-fonts/**",
-        "maxDuration": 60,
-        "memory": 1024
+        "includeFiles": "node_modules/pdfkit/js/standard-fonts/**"
       }
     }
   ],
