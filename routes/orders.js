@@ -95,20 +95,14 @@ router.post('/webhooks/geniuspay', async (req, res) => {
       const templateName = (templates.find((t) => t.id === card.template) || {}).name || card.template;
       const styleName = (physicalStyles.find((s) => s.id === card.physical_style) || {}).name || 'Design personnalisé';
 
-      if (Number(card.is_request) === 1) {
-        // A confirmed payment is the approval for a pending request — no manual review
-        // step needed, this mirrors exactly what the admin "approve" button used to do.
-        await db.query('UPDATE cards SET is_active = 1, is_request = 0 WHERE id = ?', [cardId]);
-        card.is_active = 1;
-        card.is_request = 0;
-        await notifyApprovedCustomer(card);
-      } else if (card.contact_phone) {
-        // Already an active (e.g. admin-created) card being paid via a manually-sent link.
-        await sendWhatsAppMessage(
-          card.contact_phone,
-          `Bonjour ${card.name}, nous confirmons la réception de votre paiement pour votre carte NFC. Merci !`
-        );
-      }
+      // A confirmed payment is the approval — no manual review step needed, whether the card
+      // came from a pending public request or was created directly by the admin. Either way
+      // the customer gets the exact same package: the web profile link, then the physical
+      // card PDF (recto/verso) in a follow-up message.
+      await db.query('UPDATE cards SET is_active = 1, is_request = 0 WHERE id = ?', [cardId]);
+      card.is_active = 1;
+      card.is_request = 0;
+      await notifyApprovedCustomer(card);
 
       await sendWhatsAppMessage(
         process.env.GOWA_ADMIN_PHONE,
