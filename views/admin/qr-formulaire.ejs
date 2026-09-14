@@ -1,0 +1,29 @@
+<%- include('partials/shell-open', { title: 'QR formulaire', active: 'qr-formulaire' }) %>
+
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1">QR du formulaire d'inscription</h1>
+    <p class="text-sm text-secondary-foreground">Planche à imprimer pour la prospection — chaque code renvoie vers <%= orderUrl %></p>
+  </div>
+</div>
+
+<div class="kt-card">
+  <div class="kt-card-content flex flex-col items-center gap-6 py-10">
+    <div class="bg-white rounded-md p-2 border border-border">
+      <img src="<%= qrSrc %>" alt="QR code formulaire d'inscription" style="width: 160px; height: 160px; display: block;">
+    </div>
+    <p class="text-sm text-secondary-foreground text-center max-w-md">
+      Même taille que le QR au dos d'une carte (<%= qrSize %>mm). La planche A4 envoyée à l'impression contient
+      <strong><%= qrPerSheet %> codes</strong> identiques, serrés au maximum mais espacés de 2mm pour la découpe automatique.
+    </p>
+    <form method="POST" action="/admin/qr-formulaire/print" target="_self">
+      <%- include('partials/csrf') %>
+      <button type="submit" class="kt-btn kt-btn-primary">
+        <i class="ki-filled ki-printer"></i>
+        Envoyer la planche à l'impression
+      </button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/shell-close') %>

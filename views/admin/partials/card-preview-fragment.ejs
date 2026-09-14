@@ -5,13 +5,13 @@
         imageSrc: card.custom_design_url || '',
         backImageSrc: card.custom_design_back_url || '',
         qrSrc: qrSrc,
-        qrCaption: 'Scanner pour<br>commander'
+        qrCaption: 'Scanner pour<br>voir mon profil'
       }) %>
     <% } else { %>
       <%- include('../../partials/physical-card', {
         s: style,
         qrSrc: qrSrc,
-        qrCaption: 'Scanner pour<br>commander',
+        qrCaption: 'Scanner pour<br>voir mon profil',
         previewName: false,
         previewTitle: false,
         displayName: card.name,

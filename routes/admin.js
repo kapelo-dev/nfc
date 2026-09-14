@@ -12,6 +12,7 @@ const { sanitizeCardInput, sanitizeHttpsUrl, sanitizePhone } = require('../lib/s
 const { categories, templates, resolve, getTheme, buildPreviewCard } = require('../config/templates');
 const { physicalStyles, resolvePhysicalStyle } = require('../config/physicalStyles');
 const { buildPrintSheet } = require('../lib/printSheet');
+const { buildQrOrderSheet, QR_PER_SHEET, QR_SIZE } = require('../lib/qrOrderSheet');
 const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { upload, uploadBuffer, uploadDesignBuffer } = require('../config/cloudinary');
 const { sendWhatsAppMessage, sendWhatsAppDocument } = require('../lib/whatsapp');
@@ -321,8 +322,8 @@ router.get('/cards/:id/card-preview', isAuthenticated, async (req, res) => {
     const style = physicalStyles.find((s) => s.id === styleId) || null;
     const styleName = styleId === 'custom' ? 'Design personnalisé' : style.name;
     const baseUrl = getBaseDomain();
-    const orderUrl = `https://${baseUrl}/commander?physical=${encodeURIComponent(styleId)}`;
-    const qrSrc = await QRCode.toDataURL(orderUrl, {
+    const profileUrl = `https://${baseUrl}/c/${card.card_id}`;
+    const qrSrc = await QRCode.toDataURL(profileUrl, {
       width: 260,
       margin: 1,
       color: { dark: '#111111', light: '#FFFFFF' }
@@ -393,6 +394,49 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error('Print sheet error:', error);
+    if (!res.headersSent) res.status(500).send('Erreur lors de la génération du PDF.');
+  }
+});
+
+router.get('/qr-formulaire', isAuthenticated, withPendingCount, async (req, res) => {
+  const baseUrl = getBaseDomain();
+  const orderUrl = `https://${baseUrl}/commander`;
+  const qrSrc = await QRCode.toDataURL(orderUrl, {
+    width: 260,
+    margin: 1,
+    color: { dark: '#111111', light: '#FFFFFF' }
+  });
+  res.render('admin/qr-formulaire', { orderUrl, qrSrc, qrPerSheet: QR_PER_SHEET, qrSize: QR_SIZE });
+});
+
+router.post('/qr-formulaire/print', isAuthenticated, verifyCsrf, async (req, res) => {
+  try {
+    const baseUrl = getBaseDomain();
+    const orderUrl = `https://${baseUrl}/commander`;
+
+    const doc = new PDFDocument({ size: 'A4', margin: 0 });
+    const chunks = [];
+    doc.on('data', (chunk) => chunks.push(chunk));
+    const pdfDone = new Promise((resolve) => doc.on('end', resolve));
+    await buildQrOrderSheet(doc, orderUrl);
+    doc.end();
+    await pdfDone;
+
+    const pdfBuffer = Buffer.concat(chunks);
+    const filename = `planche-qr-formulaire-${Date.now()}.pdf`;
+
+    await sendWhatsAppDocument(
+      process.env.GOWA_ADMIN_PHONE,
+      pdfBuffer,
+      filename,
+      `Planche QR formulaire d'inscription — ${QR_PER_SHEET} codes`
+    );
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('QR order sheet error:', error);
     if (!res.headersSent) res.status(500).send('Erreur lors de la génération du PDF.');
   }
 });
