@@ -9,7 +9,7 @@
     <% } %>
   </div>
 <% } else { %>
-  <form method="POST" action="/admin/print" id="print_form" target="_blank">
+  <form method="POST" action="/admin/print" id="print_form" target="_self">
     <%- include('csrf') %>
     <div class="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-accent/30">
       <span class="text-xs text-secondary-foreground" data-print-count>0 carte(s) sélectionnée(s)</span>
