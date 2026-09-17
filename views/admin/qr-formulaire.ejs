@@ -9,15 +9,45 @@
 
 <div class="kt-card">
   <div class="kt-card-content flex flex-col items-center gap-6 py-10">
-    <div class="bg-white rounded-md p-2 border border-border">
-      <img src="<%= qrSrc %>" alt="QR code formulaire d'inscription" style="width: 160px; height: 160px; display: block;">
+    <div class="flex items-center gap-2" role="group" id="qr-formulaire-mode-group">
+      <label class="kt-btn kt-btn-primary" data-mode-btn>
+        <input type="radio" name="mode-select" value="qr" class="hidden" checked>
+        Code QR
+      </label>
+      <label class="kt-btn kt-btn-outline" data-mode-btn>
+        <input type="radio" name="mode-select" value="logo" class="hidden">
+        Logo K_Pass
+      </label>
+      <label class="kt-btn kt-btn-outline" data-mode-btn>
+        <input type="radio" name="mode-select" value="both" class="hidden">
+        Les deux
+      </label>
     </div>
+
+    <div class="flex items-center justify-center gap-6">
+      <div class="flex flex-col items-center gap-2" data-preview="qr">
+        <div class="bg-white rounded-md p-2 border border-border">
+          <img src="<%= qrSrc %>" alt="QR code formulaire d'inscription" style="width: 160px; height: 160px; display: block;">
+        </div>
+        <span class="text-xs text-secondary-foreground">Code QR</span>
+      </div>
+      <div class="flex flex-col items-center gap-2 hidden" data-preview="logo">
+        <div class="bg-white rounded-md p-2 border border-border">
+          <img src="<%= logoSrc %>" alt="Logo K_Pass" style="width: 160px; height: 160px; display: block; object-fit: contain;">
+        </div>
+        <span class="text-xs text-secondary-foreground">Logo K_Pass</span>
+      </div>
+    </div>
+
     <p class="text-sm text-secondary-foreground text-center max-w-md">
-      Même taille que le QR au dos d'une carte (<%= qrSize %>mm). La planche A4 envoyée à l'impression contient
-      <strong><%= qrPerSheet %> codes</strong> identiques, serrés au maximum mais espacés de 2mm pour la découpe automatique.
+      Même taille que le QR au dos d'une carte (<%= qrSize %>mm). Chaque planche A4 envoyée à l'impression contient
+      <strong><%= qrPerSheet %> stickers</strong> identiques, serrés au maximum mais espacés de 2mm pour la découpe automatique.
+      Avec « Les deux », une planche QR et une planche logo sont envoyées ensemble.
     </p>
+
     <form method="POST" action="/admin/qr-formulaire/print" target="_self">
       <%- include('partials/csrf') %>
+      <input type="hidden" name="mode" id="qr-formulaire-mode" value="qr">
       <button type="submit" class="kt-btn kt-btn-primary">
         <i class="ki-filled ki-printer"></i>
         Envoyer la planche à l'impression
@@ -25,5 +55,33 @@
     </form>
   </div>
 </div>
+
+<script>
+  (function () {
+    var radios = document.querySelectorAll('input[name="mode-select"]');
+    var modeInput = document.getElementById('qr-formulaire-mode');
+    var qrPreview = document.querySelector('[data-preview="qr"]');
+    var logoPreview = document.querySelector('[data-preview="logo"]');
+
+    function applyMode(mode) {
+      modeInput.value = mode;
+      qrPreview.classList.toggle('hidden', mode === 'logo');
+      logoPreview.classList.toggle('hidden', mode === 'qr');
+
+      radios.forEach(function (radio) {
+        var label = radio.closest('[data-mode-btn]');
+        var active = radio.value === mode;
+        label.classList.toggle('kt-btn-primary', active);
+        label.classList.toggle('kt-btn-outline', !active);
+      });
+    }
+
+    radios.forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        if (radio.checked) applyMode(radio.value);
+      });
+    });
+  })();
+</script>
 
 <%- include('partials/shell-close') %>

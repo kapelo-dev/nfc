@@ -12,7 +12,7 @@ const { sanitizeCardInput, sanitizeHttpsUrl, sanitizePhone } = require('../lib/s
 const { categories, templates, resolve, getTheme, buildPreviewCard } = require('../config/templates');
 const { physicalStyles, resolvePhysicalStyle } = require('../config/physicalStyles');
 const { buildPrintSheet } = require('../lib/printSheet');
-const { buildQrOrderSheet, QR_PER_SHEET, QR_SIZE } = require('../lib/qrOrderSheet');
+const { buildQrOrderSheet, getLogoBuffer, QR_PER_SHEET, QR_SIZE } = require('../lib/qrOrderSheet');
 const { getPhysicalStyleQrCodes } = require('../lib/physicalStyleQr');
 const { upload, uploadBuffer, uploadDesignBuffer } = require('../config/cloudinary');
 const { sendWhatsAppMessage, sendWhatsAppDocument } = require('../lib/whatsapp');
@@ -398,6 +398,8 @@ router.post('/print', isAuthenticated, verifyCsrf, async (req, res) => {
   }
 });
 
+const QR_ORDER_MODES = ['qr', 'logo', 'both'];
+
 router.get('/qr-formulaire', isAuthenticated, withPendingCount, async (req, res) => {
   const baseUrl = getBaseDomain();
   const orderUrl = `https://${baseUrl}/commander`;
@@ -406,30 +408,34 @@ router.get('/qr-formulaire', isAuthenticated, withPendingCount, async (req, res)
     margin: 1,
     color: { dark: '#111111', light: '#FFFFFF' }
   });
-  res.render('admin/qr-formulaire', { orderUrl, qrSrc, qrPerSheet: QR_PER_SHEET, qrSize: QR_SIZE });
+  const logoSrc = `data:image/png;base64,${getLogoBuffer().toString('base64')}`;
+  res.render('admin/qr-formulaire', { orderUrl, qrSrc, logoSrc, qrPerSheet: QR_PER_SHEET, qrSize: QR_SIZE });
 });
 
 router.post('/qr-formulaire/print', isAuthenticated, verifyCsrf, async (req, res) => {
   try {
     const baseUrl = getBaseDomain();
     const orderUrl = `https://${baseUrl}/commander`;
+    const mode = QR_ORDER_MODES.includes(req.body.mode) ? req.body.mode : 'qr';
 
     const doc = new PDFDocument({ size: 'A4', margin: 0 });
     const chunks = [];
     doc.on('data', (chunk) => chunks.push(chunk));
     const pdfDone = new Promise((resolve) => doc.on('end', resolve));
-    await buildQrOrderSheet(doc, orderUrl);
+    await buildQrOrderSheet(doc, orderUrl, mode);
     doc.end();
     await pdfDone;
 
     const pdfBuffer = Buffer.concat(chunks);
     const filename = `planche-qr-formulaire-${Date.now()}.pdf`;
+    const label = { qr: 'QR code', logo: 'logo K_Pass', both: 'QR code + logo K_Pass' }[mode];
+    const pageCount = mode === 'both' ? 2 : 1;
 
     await sendWhatsAppDocument(
       process.env.GOWA_ADMIN_PHONE,
       pdfBuffer,
       filename,
-      `Planche QR formulaire d'inscription — ${QR_PER_SHEET} codes`
+      `Planche ${label} — ${pageCount * QR_PER_SHEET} stickers`
     );
 
     res.setHeader('Content-Type', 'application/pdf');
