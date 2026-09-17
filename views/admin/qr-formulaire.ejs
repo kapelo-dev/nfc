@@ -1,8 +1,8 @@
-<%- include('partials/shell-open', { title: 'QR formulaire', active: 'qr-formulaire' }) %>
+<%- include('partials/shell-open', { title: 'Stickers QR/Logo', active: 'qr-formulaire' }) %>
 
 <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
   <div>
-    <h1 class="text-xl font-semibold text-mono leading-none mb-1">QR du formulaire d'inscription</h1>
+    <h1 class="text-xl font-semibold text-mono leading-none mb-1">Stickers QR & logo K_Pass</h1>
     <p class="text-sm text-secondary-foreground">Planche à imprimer pour la prospection — chaque code renvoie vers <%= orderUrl %></p>
   </div>
 </div>
@@ -55,33 +55,5 @@
     </form>
   </div>
 </div>
-
-<script>
-  (function () {
-    var radios = document.querySelectorAll('input[name="mode-select"]');
-    var modeInput = document.getElementById('qr-formulaire-mode');
-    var qrPreview = document.querySelector('[data-preview="qr"]');
-    var logoPreview = document.querySelector('[data-preview="logo"]');
-
-    function applyMode(mode) {
-      modeInput.value = mode;
-      qrPreview.classList.toggle('hidden', mode === 'logo');
-      logoPreview.classList.toggle('hidden', mode === 'qr');
-
-      radios.forEach(function (radio) {
-        var label = radio.closest('[data-mode-btn]');
-        var active = radio.value === mode;
-        label.classList.toggle('kt-btn-primary', active);
-        label.classList.toggle('kt-btn-outline', !active);
-      });
-    }
-
-    radios.forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        if (radio.checked) applyMode(radio.value);
-      });
-    });
-  })();
-</script>
 
 <%- include('partials/shell-close') %>

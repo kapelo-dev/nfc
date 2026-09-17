@@ -71,6 +71,33 @@ document.addEventListener('DOMContentLoaded', function () {
     inner.style.transform = flipped ? '' : 'rotateY(180deg)';
   });
 
+  const qrModeInput = document.getElementById('qr-formulaire-mode');
+  const qrModeRadios = document.querySelectorAll('input[name="mode-select"]');
+  if (qrModeInput && qrModeRadios.length) {
+    const qrPreview = document.querySelector('[data-preview="qr"]');
+    const logoPreview = document.querySelector('[data-preview="logo"]');
+
+    function applyQrMode(mode) {
+      qrModeInput.value = mode;
+      if (qrPreview) qrPreview.classList.toggle('hidden', mode === 'logo');
+      if (logoPreview) logoPreview.classList.toggle('hidden', mode === 'qr');
+
+      qrModeRadios.forEach(function (radio) {
+        const label = radio.closest('[data-mode-btn]');
+        if (!label) return;
+        const active = radio.value === mode;
+        label.classList.toggle('kt-btn-primary', active);
+        label.classList.toggle('kt-btn-outline', !active);
+      });
+    }
+
+    qrModeRadios.forEach(function (radio) {
+      radio.addEventListener('change', function () {
+        if (radio.checked) applyQrMode(radio.value);
+      });
+    });
+  }
+
   document.querySelectorAll('[data-preview-trigger]').forEach(function (btn) {
     btn.addEventListener('click', async function () {
       const cardId = btn.getAttribute('data-card-id');
